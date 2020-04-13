@@ -114,10 +114,10 @@ func (self *Connection) Logout() error {
 	}
 
 	/*
-		req, err := http.NewRequest("DELETE", self.authURI, nil)
+		req, err := http.NewRequest("DELETE", self.authURL, nil)
 
 		if err != nil {
-			return fmt.Errorf("DELETE %s: %q", self.authURI, err)
+			return fmt.Errorf("DELETE %s: %q", self.authURL, err)
 		}
 
 		req.Header.Set("Authorization", fmt.Sprintf("%s %s", self.TokenType(), self.AccessToken()))
@@ -125,13 +125,13 @@ func (self *Connection) Logout() error {
 		resp, err := self.client.Do(req)
 
 		if err != nil {
-			return fmt.Errorf("DELETE %s: %q", self.authURI, err)
+			return fmt.Errorf("DELETE %s: %q", self.authURL, err)
 		}
 
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("DELETE %s: %s", self.authURI, resp.Status)
+			return fmt.Errorf("DELETE %s: %s", self.authURL, resp.Status)
 		}
 	*/
 

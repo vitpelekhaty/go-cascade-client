@@ -1,6 +1,9 @@
+// +build integration
+
 package cascade
 
 import (
+	"flag"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,15 +14,29 @@ import (
 	"github.com/vitpelekhaty/httptracer"
 )
 
-const (
+var (
+	username   string
+	password   string
+	authURL    string
+	cascadeURL string
+
+/*
 	username = `sibgenco`
 	password = `AmXn9GZZd@#xGB!`
-	authURI  = `http://10.253.128.1/oauth/token`
-	uri      = `http://10.253.128.1/api/cascade`
+	authURL  = `http://10.253.128.1/oauth/token`
+	cascadeURL      = `http://10.253.128.1/api/cascade`
+*/
 )
 
+func init() {
+	flag.StringVar(&username, "username", "", "username")
+	flag.StringVar(&password, "password", "", "password")
+	flag.StringVar(&cascadeURL, "api-url", "", "Cascade API URL")
+	flag.StringVar(&authURL, "auth-url", "", "Auth URL")
+}
+
 func TestConnection_LoginLogout(t *testing.T) {
-	done := false
+	done := true
 
 	_, exec, _, ok := runtime.Caller(0)
 
@@ -52,7 +69,7 @@ func TestConnection_LoginLogout(t *testing.T) {
 			}
 		}))
 
-	conn := NewConnection(uri, client)
+	conn := NewConnection(cascadeURL, client)
 
 	defer func() {
 		done = true
@@ -62,7 +79,7 @@ func TestConnection_LoginLogout(t *testing.T) {
 		}
 	}()
 
-	err = conn.Login(authURI, Auth{Username: username, Password: password})
+	err = conn.Login(authURL, Auth{Username: username, Password: password})
 
 	if err != nil {
 		t.Fatal(err)
