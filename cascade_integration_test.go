@@ -19,13 +19,6 @@ var (
 	password   string
 	authURL    string
 	cascadeURL string
-
-/*
-	username = `sibgenco`
-	password = `AmXn9GZZd@#xGB!`
-	authURL  = `http://10.253.128.1/oauth/token`
-	cascadeURL      = `http://10.253.128.1/api/cascade`
-*/
 )
 
 func init() {
@@ -35,7 +28,7 @@ func init() {
 	flag.StringVar(&authURL, "auth-url", "", "Auth URL")
 }
 
-func TestConnection_LoginLogout(t *testing.T) {
+func TestConnection_LoginLogout_Real(t *testing.T) {
 	done := true
 
 	_, exec, _, ok := runtime.Caller(0)

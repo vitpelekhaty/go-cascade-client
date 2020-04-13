@@ -1,0 +1,10 @@
+{
+  "access_token": "30fcfd24-7fb0-4e57-9646-803aed79dbdf",
+  "token_type": "bearer",
+  "expires_in": 183521,
+  "scope": "trust",
+  "userid": 8769,
+  "login": "USERNAME",
+  "name": "Доступ к API",
+  "server_type": "Development"
+}
