@@ -8,6 +8,10 @@ import (
 var (
 	// Login метод авторизации
 	Login = "/oauth/token"
+	// CounterHouse метод получения списка приборов учета
+	CounterHouse = "/api/cascade/counter-house"
+	// Readings метод чтения архива показаний прибора учета
+	Readings = "/api/cascade/counter-house/reading"
 )
 
 // URLJoin возвращает полный URI метода API
