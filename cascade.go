@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // Connection соединение с Каскадом
@@ -61,7 +62,10 @@ func (self *Connection) Login(authURI string, auth Auth) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", authURI, nil)
+	form := url.Values{}
+	form.Add("grant_type", "client_credentials")
+
+	req, err := http.NewRequest("POST", authURI, strings.NewReader(form.Encode()))
 
 	if err != nil {
 		return fmt.Errorf("POST %s: %q", authURI, err)
@@ -104,29 +108,32 @@ func (self *Connection) Login(authURI string, auth Auth) error {
 
 // Logout закрытие сессии пользователя
 func (self *Connection) Logout() error {
+	// TODO: необходимо уточнить порядок завершения сессии пользователя
 	if self.login == nil {
 		return nil
 	}
 
-	req, err := http.NewRequest("DELETE", self.authURI, nil)
+	/*
+		req, err := http.NewRequest("DELETE", self.authURI, nil)
 
-	if err != nil {
-		return fmt.Errorf("DELETE %s: %q", self.authURI, err)
-	}
+		if err != nil {
+			return fmt.Errorf("DELETE %s: %q", self.authURI, err)
+		}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", self.TokenType(), self.AccessToken()))
+		req.Header.Set("Authorization", fmt.Sprintf("%s %s", self.TokenType(), self.AccessToken()))
 
-	resp, err := self.client.Do(req)
+		resp, err := self.client.Do(req)
 
-	if err != nil {
-		return fmt.Errorf("DELETE %s: %q", self.authURI, err)
-	}
+		if err != nil {
+			return fmt.Errorf("DELETE %s: %q", self.authURI, err)
+		}
 
-	defer resp.Body.Close()
+		defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("DELETE %s: %s", self.authURI, resp.Status)
-	}
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("DELETE %s: %s", self.authURI, resp.Status)
+		}
+	*/
 
 	self.login = nil
 
