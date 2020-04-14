@@ -1,0 +1,64 @@
+[
+  {
+    "id": 4685,
+    "title": "А. Петрова, 65",
+    "name": "ВЗЛЕТ ТСРВ-033 802548",
+    "serialNumber": "802548",
+    "inputs": [
+      {
+        "number": 0,
+        "channels": [
+          {
+            "id": 9470,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9471,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9472,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5278,
+    "title": "Телефонная, 50",
+    "name": "ВЗЛЕТ ТСРВ-031 720483",
+    "serialNumber": "720483",
+    "inputs": [
+      {
+        "number": 0,
+        "channels": [
+          {
+            "id": 9569,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9570,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9571,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          }
+        ]
+      }
+    ]
+  }
+]

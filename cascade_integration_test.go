@@ -78,3 +78,66 @@ func TestConnection_LoginLogout_Real(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestConnection_CounterHouse_Real(t *testing.T) {
+	done := false
+
+	_, exec, _, ok := runtime.Caller(0)
+
+	if !ok {
+		t.FailNow()
+	}
+
+	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/counterHouse")
+
+	f, err := os.Create(tracedata)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		f.WriteString("]")
+		f.Close()
+	}()
+
+	f.WriteString("[")
+
+	client := &http.Client{Timeout: time.Second * 10}
+	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
+		httptracer.WithCallback(func(entry *httptracer.Entry) {
+			if !done {
+				if entry != nil {
+					f.WriteString(",")
+				}
+			}
+		}))
+
+	conn := NewConnection(cascadeURL, client)
+
+	defer func() {
+		done = true
+
+		if err := conn.Logout(); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	err = conn.Login(authURL, Auth{Username: username, Password: password})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	done = true
+
+	devices, err := conn.CounterHouse()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(devices) == 0 {
+		t.Error("CounterHouse() failed!")
+	}
+}

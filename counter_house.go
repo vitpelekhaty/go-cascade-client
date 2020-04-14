@@ -85,7 +85,7 @@ type CounterHouseChannelDto struct {
 const inFlow = "inFlow"
 
 // outFlow тип подключения - обратное
-const outFlow = "outflow"
+const outFlow = "outFlow"
 
 // Flow тип подключения
 type Flow byte
@@ -112,10 +112,10 @@ func (self *CounterHouseChannelDto) Flow() Flow {
 }
 
 // heat тип ресурса - отопление
-const heat = "heat"
+const heat = "Heat"
 
 // hotWater тип ресурса - горячая вода
-const hotWater = "hotWater"
+const hotWater = "HotWater"
 
 // Resource тип ресурса
 type Resource byte
