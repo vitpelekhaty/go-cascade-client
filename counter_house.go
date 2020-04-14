@@ -9,13 +9,13 @@ import (
 // CounterHouse возвращает список приборов учета
 func (self *Connection) CounterHouse() ([]byte, error) {
 	if err := self.checkConnection(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
 	}
 
 	methodURL, err := URLJoin(self.baseURL, CounterHouse)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
 	}
 
 	req, err := http.NewRequest("GET", methodURL, nil)
@@ -29,7 +29,7 @@ func (self *Connection) CounterHouse() ([]byte, error) {
 	resp, err := self.client.Do(req)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
 	}
 
 	defer resp.Body.Close()
@@ -41,7 +41,7 @@ func (self *Connection) CounterHouse() ([]byte, error) {
 	data, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
 	}
 
 	return data, nil

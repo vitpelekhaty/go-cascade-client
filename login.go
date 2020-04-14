@@ -12,15 +12,15 @@ import (
 // Login авторизация пользователя в Каскаде
 func (self *Connection) Login(authURL string, auth Auth) error {
 	if self.client == nil {
-		return ErrorHTTPClientNotSpecified
+		return fmt.Errorf("POST %s: %v", authURL, ErrorHTTPClientNotSpecified)
 	}
 
 	if self.login != nil {
-		return ErrorUserAuthorized
+		return fmt.Errorf("POST %s: %v", authURL, ErrorUserAuthorized)
 	}
 
 	if _, err := url.Parse(authURL); err != nil {
-		return err
+		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
 	form := url.Values{}
@@ -29,7 +29,7 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 	req, err := http.NewRequest("POST", authURL, strings.NewReader(form.Encode()))
 
 	if err != nil {
-		return fmt.Errorf("POST %s: %q", authURL, err)
+		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", auth.Secret()))
@@ -38,7 +38,7 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 	resp, err := self.client.Do(req)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
 	defer resp.Body.Close()
@@ -50,7 +50,7 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return fmt.Errorf("POST %s: %q", authURL, err)
+		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
 	var login LoginResponse
@@ -58,7 +58,7 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 	err = json.Unmarshal(body, &login)
 
 	if err != nil {
-		return fmt.Errorf("POST %s: %q", authURL, err)
+		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
 	self.authURL = authURL
