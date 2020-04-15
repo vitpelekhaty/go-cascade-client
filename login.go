@@ -69,32 +69,9 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 
 // Logout закрытие сессии пользователя
 func (self *Connection) Logout() error {
-	// TODO: необходимо уточнить порядок завершения сессии пользователя
 	if self.login == nil {
 		return nil
 	}
-
-	/*
-		req, err := http.NewRequest("DELETE", self.authURL, nil)
-
-		if err != nil {
-			return fmt.Errorf("DELETE %s: %q", self.authURL, err)
-		}
-
-		req.Header.Set("Authorization", fmt.Sprintf("%s %s", self.TokenType(), self.AccessToken()))
-
-		resp, err := self.client.Do(req)
-
-		if err != nil {
-			return fmt.Errorf("DELETE %s: %q", self.authURL, err)
-		}
-
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("DELETE %s: %s", self.authURL, resp.Status)
-		}
-	*/
 
 	self.login = nil
 
