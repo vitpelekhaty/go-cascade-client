@@ -64,14 +64,36 @@ func (self *Connection) Readings(deviceID int64, archive DataArchive, beginAt, e
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("POST %s: %s", Readings, resp.Status)
-	}
-
 	data, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, fmt.Errorf("POST %s: %v", Readings, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		var (
+			errorMessage     string
+			errorDescription string
+		)
+
+		if len(data) > 0 {
+			var message Message
+
+			err = json.Unmarshal(data, &message)
+
+			if err != nil {
+				return nil, fmt.Errorf("POST %s %d: %v", Readings, resp.StatusCode, err)
+			}
+
+			errorMessage = message.Text
+			errorDescription = message.Description
+
+			return nil, fmt.Errorf("POST %s %d: %s: %s", Readings, resp.StatusCode, errorMessage,
+				errorDescription)
+
+		}
+
+		return nil, fmt.Errorf("POST %s: %s", Readings, resp.Status)
 	}
 
 	return data, nil
@@ -143,7 +165,7 @@ type CounterHouseReadingDto struct {
 	// ChannelID идентификатор канала/трубы
 	ChannelID int64 `json:"channelId"`
 	// DT момент показания
-	DT time.Time `json:"dt"`
+	DT RequestTime `json:"dt"`
 	// ID идентификатор показания
 	ID int64 `json:"id"`
 	// IsBadRow признак "плохой" строки показания (признак нештатной ситуации, зафиксированной на приборе учета)
@@ -159,7 +181,7 @@ type CounterHouseReadingDto struct {
 	// TCW температура холодной воды
 	TCW float32 `json:"tcw"`
 	// TI время штатной работы прибора учета
-	TI float32 `json:"ti"`
+	TI int `json:"ti"`
 	// V расход теплоносителя в м3
 	V float32 `json:"v"`
 }
@@ -174,4 +196,12 @@ func (self *CounterHouseReadingDto) DataArchive() DataArchive {
 	default:
 		return UnknownArchive
 	}
+}
+
+// Message сообщение сервера об ошибке
+type Message struct {
+	// Text текст ошибки
+	Text string `json:"message"`
+	// Description описание ошибки
+	Description string `json:"description"`
 }

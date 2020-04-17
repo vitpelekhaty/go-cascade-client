@@ -2,8 +2,16 @@ package cascade
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/vitpelekhaty/httptracer"
 )
 
 var requestTimeStringTestCases = []struct {
@@ -133,5 +141,199 @@ func TestCounterHouseReadingDto_DataArchive(t *testing.T) {
 			t.Errorf("CounterHouseReadingDto.DataArchive(%d) failed: have %v, want %v", test.value, have,
 				test.want)
 		}
+	}
+}
+
+var beginAt = time.Date(2020, 4, 2, 1, 0, 0, 0, time.UTC)
+
+func TestConnection_Readings_Hours_422(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(MockServerFunc))
+	defer ts.Close()
+
+	done := false
+
+	_, exec, _, ok := runtime.Caller(0)
+
+	if !ok {
+		t.FailNow()
+	}
+
+	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/readingsHours_422_test")
+
+	f, err := os.Create(tracedata)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		f.WriteString("]")
+		f.Close()
+	}()
+
+	f.WriteString("[")
+
+	client := &http.Client{Timeout: time.Second * 10}
+	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
+		httptracer.WithCallback(func(entry *httptracer.Entry) {
+			if !done {
+				if entry != nil {
+					f.WriteString(",")
+				}
+			}
+		}))
+
+	conn := NewConnection(ts.URL, client)
+
+	defer func() {
+		done = true
+
+		if err := conn.Logout(); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	login, err := URLJoin(ts.URL, Login)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = conn.Login(login, auth)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ch, err := conn.CounterHouse()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(ch) == 0 {
+		t.Error("CounterHouse() failed!")
+	}
+
+	var devices []CounterHouseDto
+
+	err = json.Unmarshal(ch, &devices)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	done = true
+
+	device := devices[0]
+
+	_, err = conn.Readings(device.ID, HourArchive, beginAt, beginAt.Add(time.Hour*24*8))
+
+	if err != nil {
+		errorMessage := err.Error()
+
+		if !strings.Contains(errorMessage, "Domain exception has occurred") {
+			t.Errorf("Readings 422  failed: have error %s", errorMessage)
+		}
+	}
+}
+
+func TestConnection_Readings_Hours_200(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(MockServerFunc))
+	defer ts.Close()
+
+	done := false
+
+	_, exec, _, ok := runtime.Caller(0)
+
+	if !ok {
+		t.FailNow()
+	}
+
+	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/readingsHours_200_test")
+
+	f, err := os.Create(tracedata)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		f.WriteString("]")
+		f.Close()
+	}()
+
+	f.WriteString("[")
+
+	client := &http.Client{Timeout: time.Second * 10}
+	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
+		httptracer.WithCallback(func(entry *httptracer.Entry) {
+			if !done {
+				if entry != nil {
+					f.WriteString(",")
+				}
+			}
+		}))
+
+	conn := NewConnection(ts.URL, client)
+
+	defer func() {
+		done = true
+
+		if err := conn.Logout(); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	login, err := URLJoin(ts.URL, Login)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = conn.Login(login, auth)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ch, err := conn.CounterHouse()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(ch) == 0 {
+		t.Error("CounterHouse() failed!")
+	}
+
+	var devices []CounterHouseDto
+
+	err = json.Unmarshal(ch, &devices)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	done = true
+
+	device := devices[0]
+
+	data, err := conn.Readings(device.ID, HourArchive, beginAt, beginAt.Add(time.Hour*24))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var archive []CounterHouseReadingDto
+
+	err = json.Unmarshal(data, &archive)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(archive) == 0 {
+		t.Error("Readings(HourArchive) failed: empty archive")
 	}
 }

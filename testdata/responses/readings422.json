@@ -1,0 +1,7 @@
+{
+  "exception": "ru.bicenter.core.exception.domain.http.HttpDomainException",
+  "message": "Domain exception has occurred",
+  "description": "Получение статистики расходов более чем за 7 дней временно недоступно",
+  "nestedExceptions": [],
+  "status": "UNPROCESSABLE_ENTITY"
+}

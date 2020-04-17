@@ -8,11 +8,14 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 var responses = map[string]string{
-	Login:        "/testdata/responses/login.json",
-	CounterHouse: "/testdata/responses/counterHouse.json",
+	Login:             "/testdata/responses/login.json",
+	CounterHouse:      "/testdata/responses/counterHouse.json",
+	Readings:          "/testdata/responses/readings200.json",
+	Readings + " 422": "/testdata/responses/readings422.json",
 }
 
 func accessToken() (string, error) {
@@ -110,6 +113,75 @@ func MockServerFunc(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data, err := ioutil.ReadFile(path)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
+
+		return
+	}
+
+	// /api/cascade/counter-house/reading
+	if strings.HasPrefix(r.RequestURI, Readings) && r.Method == "POST" {
+		token, err := accessToken()
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		path = filepath.Join(filepath.Dir(exec), responses[Readings])
+
+		authHeader := r.Header.Get("Authorization")
+		values := strings.Split(authHeader, " ")
+
+		if len(values) < 2 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		credentials := values[1]
+
+		if credentials != token {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		data, err := ioutil.ReadAll(r.Body)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		var query ReadingsRequest
+
+		err = json.Unmarshal(data, &query)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		beginAt := time.Time(query.BeginAt)
+		endAt := time.Time(query.EndAt)
+
+		if endAt.Sub(beginAt) > (time.Hour * 24 * 7) {
+			path = filepath.Join(filepath.Dir(exec), responses[Readings+" 422"])
+
+			data, _ = ioutil.ReadFile(path)
+
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			w.Write(data)
+
+			return
+		}
+
+		data, err = ioutil.ReadFile(path)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

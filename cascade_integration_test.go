@@ -143,11 +143,9 @@ func TestConnection_CounterHouse_Real(t *testing.T) {
 	}
 }
 
-var beginAt = time.Date(2019, 12, 11, 1, 0, 0, 0, time.UTC)
-var endAt = time.Date(2019, 12, 12, 1, 0, 0, 0, time.UTC)
-var archive = HourArchive
+var beginAt = time.Date(2020, 4, 2, 1, 0, 0, 0, time.UTC)
 
-func TestConnection_Readings_Real(t *testing.T) {
+func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 	done := false
 
 	_, exec, _, ok := runtime.Caller(0)
@@ -156,7 +154,7 @@ func TestConnection_Readings_Real(t *testing.T) {
 		t.FailNow()
 	}
 
-	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/readings")
+	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/readings_hours")
 
 	f, err := os.Create(tracedata)
 
@@ -219,13 +217,96 @@ func TestConnection_Readings_Real(t *testing.T) {
 
 	device := devices[0]
 
-	data, err := conn.Readings(device.ID, archive, beginAt, endAt)
+	data, err := conn.Readings(device.ID, HourArchive, beginAt, beginAt.Add(time.Hour*24))
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if len(data) == 0 {
-		t.Error("Readings() failed!")
+		t.Error("hours Readings() failed!")
+	}
+}
+
+func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
+	done := false
+
+	_, exec, _, ok := runtime.Caller(0)
+
+	if !ok {
+		t.FailNow()
+	}
+
+	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/readings_daily")
+
+	f, err := os.Create(tracedata)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		f.WriteString("]")
+		f.Close()
+	}()
+
+	f.WriteString("[")
+
+	client := &http.Client{Timeout: time.Second * 10}
+	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
+		httptracer.WithCallback(func(entry *httptracer.Entry) {
+			if !done {
+				if entry != nil {
+					f.WriteString(",")
+				}
+			}
+		}))
+
+	conn := NewConnection(cascadeURL, client)
+
+	defer func() {
+		done = true
+
+		if err := conn.Logout(); err != nil {
+			t.Error(err)
+		}
+	}()
+
+	err = conn.Login(authURL, Auth{Username: username, Password: password})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ch, err := conn.CounterHouse()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(ch) == 0 {
+		t.Error("CounterHouse() failed!")
+	}
+
+	var devices []CounterHouseDto
+
+	err = json.Unmarshal(ch, &devices)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	done = true
+
+	device := devices[0]
+
+	data, err := conn.Readings(device.ID, DailyArchive, beginAt, beginAt.Add(time.Hour*72))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(data) == 0 {
+		t.Error("daily Readings() failed!")
 	}
 }
