@@ -143,8 +143,6 @@ func TestConnection_CounterHouse_Real(t *testing.T) {
 	}
 }
 
-var beginAt = time.Date(2020, 4, 2, 1, 0, 0, 0, time.UTC)
-
 func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 	done := false
 
