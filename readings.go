@@ -23,6 +23,18 @@ const (
 	DailyArchive DataArchive = 2
 )
 
+// String возвращает строковое описание типа архива показаний
+func (self DataArchive) String() string {
+	switch self {
+	case HourArchive:
+		return "HourArchive"
+	case DailyArchive:
+		return "DailyArchive"
+	default:
+		return "UnknownArchive"
+	}
+}
+
 func (self *Connection) Readings(deviceID int64, archive DataArchive, beginAt, endAt time.Time) ([]byte, error) {
 	if err := self.checkConnection(); err != nil {
 		return nil, fmt.Errorf("POST %s: %v", Readings, err)

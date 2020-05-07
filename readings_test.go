@@ -337,3 +337,33 @@ func TestConnection_Readings_Hours_200(t *testing.T) {
 		t.Error("Readings(HourArchive) failed: empty archive")
 	}
 }
+
+var dataArchiveStringCases = []struct {
+	archive DataArchive
+	want    string
+}{
+	{
+		archive: HourArchive,
+		want:    "HourArchive",
+	},
+	{
+		archive: DailyArchive,
+		want:    "DailyArchive",
+	},
+	{
+		archive: UnknownArchive,
+		want:    "UnknownArchive",
+	},
+}
+
+func TestDataArchive_String(t *testing.T) {
+	var have string
+
+	for _, test := range dataArchiveStringCases {
+		have = test.archive.String()
+
+		if have != test.want {
+			t.Errorf("DataArchive.String() failed: want %s, have %s", test.want, have)
+		}
+	}
+}
