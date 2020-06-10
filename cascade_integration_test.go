@@ -200,7 +200,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 	}
 
 	if len(ch) == 0 {
-		t.Error("CounterHouse() failed!")
+		t.Fatal("hours Readings() failed: CounterHouse() failed!")
 	}
 
 	var devices []CounterHouseDto
@@ -209,6 +209,10 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if len(devices) == 0 {
+		t.Fatal("hours Readings() failed: no devices!")
 	}
 
 	done = true
@@ -283,7 +287,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 	}
 
 	if len(ch) == 0 {
-		t.Error("CounterHouse() failed!")
+		t.Fatal("daily Readings() failed: CounterHouse() failed!")
 	}
 
 	var devices []CounterHouseDto
@@ -292,6 +296,10 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if len(devices) == 0 {
+		t.Fatal("daily Readings() failed: no devices!")
 	}
 
 	done = true
