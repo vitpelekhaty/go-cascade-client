@@ -56,7 +56,7 @@ func TestConnection_LoginLogout_Real(t *testing.T) {
 
 	f.WriteString("[")
 
-	var client http.Client
+	var client *http.Client
 
 	if insecureSkipVerify {
 		transport := &http.Transport{
@@ -120,7 +120,7 @@ func TestConnection_CounterHouse_Real(t *testing.T) {
 
 	f.WriteString("[")
 
-	var client http.Client
+	var client *http.Client
 
 	if insecureSkipVerify {
 		transport := &http.Transport{
@@ -196,7 +196,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 
 	f.WriteString("[")
 
-	var client http.Client
+	var client *http.Client
 
 	if insecureSkipVerify {
 		transport := &http.Transport{
@@ -296,7 +296,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 
 	f.WriteString("[")
 
-	var client http.Client
+	var client *http.Client
 
 	if insecureSkipVerify {
 		transport := &http.Transport{
