@@ -3,6 +3,7 @@
 package cascade
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"net/http"
@@ -16,10 +17,11 @@ import (
 )
 
 var (
-	username   string
-	password   string
-	authURL    string
-	cascadeURL string
+	username           string
+	password           string
+	authURL            string
+	cascadeURL         string
+	insecureSkipVerify bool
 )
 
 func init() {
@@ -27,6 +29,7 @@ func init() {
 	flag.StringVar(&password, "password", "", "password")
 	flag.StringVar(&cascadeURL, "api-url", "", "Cascade API URL")
 	flag.StringVar(&authURL, "auth-url", "", "Auth URL")
+	flag.BoolVar(&insecureSkipVerify, "insecure-skip-verify", false, "Insecure skip verify")
 }
 
 func TestConnection_LoginLogout_Real(t *testing.T) {
@@ -53,7 +56,20 @@ func TestConnection_LoginLogout_Real(t *testing.T) {
 
 	f.WriteString("[")
 
-	client := &http.Client{Timeout: time.Second * 10}
+	var client http.Client
+
+	if insecureSkipVerify {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client = &http.Client{
+			Timeout:   time.Second * 10,
+			Transport: transport,
+		}
+	} else {
+		client = &http.Client{Timeout: time.Second * 10}
+	}
+
 	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
 		httptracer.WithCallback(func(entry *httptracer.Entry) {
 			if !done {
@@ -104,7 +120,20 @@ func TestConnection_CounterHouse_Real(t *testing.T) {
 
 	f.WriteString("[")
 
-	client := &http.Client{Timeout: time.Second * 10}
+	var client http.Client
+
+	if insecureSkipVerify {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client = &http.Client{
+			Timeout:   time.Second * 10,
+			Transport: transport,
+		}
+	} else {
+		client = &http.Client{Timeout: time.Second * 10}
+	}
+
 	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
 		httptracer.WithCallback(func(entry *httptracer.Entry) {
 			if !done {
@@ -167,7 +196,20 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 
 	f.WriteString("[")
 
-	client := &http.Client{Timeout: time.Second * 10}
+	var client http.Client
+
+	if insecureSkipVerify {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client = &http.Client{
+			Timeout:   time.Second * 10,
+			Transport: transport,
+		}
+	} else {
+		client = &http.Client{Timeout: time.Second * 10}
+	}
+
 	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
 		httptracer.WithCallback(func(entry *httptracer.Entry) {
 			if !done {
@@ -254,7 +296,20 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 
 	f.WriteString("[")
 
-	client := &http.Client{Timeout: time.Second * 10}
+	var client http.Client
+
+	if insecureSkipVerify {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client = &http.Client{
+			Timeout:   time.Second * 10,
+			Transport: transport,
+		}
+	} else {
+		client = &http.Client{Timeout: time.Second * 10}
+	}
+
 	client = httptracer.Trace(client, httptracer.WithBodies(true), httptracer.WithWriter(f),
 		httptracer.WithCallback(func(entry *httptracer.Entry) {
 			if !done {
