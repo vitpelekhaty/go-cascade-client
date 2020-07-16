@@ -260,18 +260,18 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 		t.Fatal("hours Readings() failed: no devices!")
 	}
 
-	done = true
+	for index, device := range devices {
+		done = index == (len(devices) - 1)
 
-	device := devices[0]
+		data, err := conn.Readings(device.ID, HourArchive, beginningOfADay, beginningOfADay.Add(time.Hour*24))
 
-	data, err := conn.Readings(device.ID, HourArchive, beginningOfADay, beginningOfADay.Add(time.Hour*24))
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(data) == 0 {
-		t.Error("hours Readings() failed!")
+		if len(data) == 0 {
+			t.Logf("empty readings for %d", device.ID)
+		}
 	}
 }
 
@@ -360,17 +360,17 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 		t.Fatal("daily Readings() failed: no devices!")
 	}
 
-	done = true
+	for index, device := range devices {
+		done = index == (len(devices) - 1)
 
-	device := devices[0]
+		data, err := conn.Readings(device.ID, DailyArchive, beginningOfADay, beginningOfADay.Add(time.Hour*72))
 
-	data, err := conn.Readings(device.ID, DailyArchive, beginningOfADay, beginningOfADay.Add(time.Hour*72))
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(data) == 0 {
-		t.Error("daily Readings() failed!")
+		if len(data) == 0 {
+			t.Logf("empty readings for %d", device.ID)
+		}
 	}
 }
