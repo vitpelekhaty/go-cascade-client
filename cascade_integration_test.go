@@ -32,6 +32,9 @@ func init() {
 	flag.BoolVar(&insecureSkipVerify, "insecure-skip-verify", false, "Insecure skip verify")
 }
 
+var now = time.Now()
+var beginningOfADay = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+
 func TestConnection_LoginLogout_Real(t *testing.T) {
 	done := true
 
@@ -261,7 +264,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 
 	device := devices[0]
 
-	data, err := conn.Readings(device.ID, HourArchive, beginAt, beginAt.Add(time.Hour*24))
+	data, err := conn.Readings(device.ID, HourArchive, beginningOfADay, beginningOfADay.Add(time.Hour*24))
 
 	if err != nil {
 		t.Fatal(err)
@@ -361,7 +364,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 
 	device := devices[0]
 
-	data, err := conn.Readings(device.ID, DailyArchive, beginAt, beginAt.Add(time.Hour*72))
+	data, err := conn.Readings(device.ID, DailyArchive, beginningOfADay, beginningOfADay.Add(time.Hour*72))
 
 	if err != nil {
 		t.Fatal(err)
