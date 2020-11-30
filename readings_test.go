@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/vitpelekhaty/httptracer"
+
+	"github.com/vitpelekhaty/go-cascade-client/archive"
 )
 
 var requestTimeStringTestCases = []struct {
@@ -73,32 +75,32 @@ func TestRequestTime_MarshalJSON(t *testing.T) {
 
 var dataArchiveUnmarshalJSONTestCases = []struct {
 	value string
-	want  DataArchive
+	want  archive.DataArchive
 }{
 	{
 		value: "1",
-		want:  HourArchive,
+		want:  archive.HourArchive,
 	},
 	{
 		value: "2",
-		want:  DailyArchive,
+		want:  archive.DailyArchive,
 	},
 	{
 		value: "0",
-		want:  UnknownArchive,
+		want:  archive.UnknownArchive,
 	},
 	{
 		value: "10",
-		want:  UnknownArchive,
+		want:  archive.UnknownArchive,
 	},
 	{
 		value: "",
-		want:  UnknownArchive,
+		want:  archive.UnknownArchive,
 	},
 }
 
 func TestDataArchive_UnmarshalJSON(t *testing.T) {
-	var archive DataArchive
+	var archive archive.DataArchive
 
 	for _, test := range dataArchiveUnmarshalJSONTestCases {
 		archive.UnmarshalJSON([]byte(test.value))
@@ -111,24 +113,24 @@ func TestDataArchive_UnmarshalJSON(t *testing.T) {
 
 var readingsDataArchiveTestCases = []struct {
 	value int
-	want  DataArchive
+	want  archive.DataArchive
 }{
 	{
 		value: 1,
-		want:  HourArchive,
+		want:  archive.HourArchive,
 	},
 	{
 		value: 2,
-		want:  DailyArchive,
+		want:  archive.DailyArchive,
 	},
 	{
 		value: 10,
-		want:  UnknownArchive,
+		want:  archive.UnknownArchive,
 	},
 }
 
 func TestCounterHouseReadingDto_DataArchive(t *testing.T) {
-	var have DataArchive
+	var have archive.DataArchive
 
 	for _, test := range readingsDataArchiveTestCases {
 		r := CounterHouseReadingDto{
@@ -227,7 +229,7 @@ func TestConnection_Readings_Hours_422(t *testing.T) {
 
 	device := devices[0]
 
-	_, err = conn.Readings(device.ID, HourArchive, beginAt, beginAt.Add(time.Hour*24*8))
+	_, err = conn.Readings(device.ID, archive.HourArchive, beginAt, beginAt.Add(time.Hour*24*8))
 
 	if err != nil {
 		errorMessage := err.Error()
@@ -319,7 +321,7 @@ func TestConnection_Readings_Hours_200(t *testing.T) {
 
 	device := devices[0]
 
-	data, err := conn.Readings(device.ID, HourArchive, beginAt, beginAt.Add(time.Hour*24))
+	data, err := conn.Readings(device.ID, archive.HourArchive, beginAt, beginAt.Add(time.Hour*24))
 
 	if err != nil {
 		t.Fatal(err)
@@ -339,19 +341,19 @@ func TestConnection_Readings_Hours_200(t *testing.T) {
 }
 
 var dataArchiveStringCases = []struct {
-	archive DataArchive
+	archive archive.DataArchive
 	want    string
 }{
 	{
-		archive: HourArchive,
+		archive: archive.HourArchive,
 		want:    "HourArchive",
 	},
 	{
-		archive: DailyArchive,
+		archive: archive.DailyArchive,
 		want:    "DailyArchive",
 	},
 	{
-		archive: UnknownArchive,
+		archive: archive.UnknownArchive,
 		want:    "UnknownArchive",
 	},
 }

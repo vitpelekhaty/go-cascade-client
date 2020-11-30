@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/vitpelekhaty/httptracer"
+
+	"github.com/vitpelekhaty/go-cascade-client/archive"
 )
 
 var (
@@ -263,7 +265,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 	for index, device := range devices {
 		done = index == (len(devices) - 1)
 
-		data, err := conn.Readings(device.ID, HourArchive, beginningOfADay, beginningOfADay.Add(time.Hour*24))
+		data, err := conn.Readings(device.ID, archive.HourArchive, beginningOfADay, beginningOfADay.Add(time.Hour*24))
 
 		if err != nil {
 			t.Fatal(err)
@@ -363,7 +365,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 	for index, device := range devices {
 		done = index == (len(devices) - 1)
 
-		data, err := conn.Readings(device.ID, DailyArchive, beginningOfADay, beginningOfADay.Add(time.Hour*72))
+		data, err := conn.Readings(device.ID, archive.DailyArchive, beginningOfADay, beginningOfADay.Add(time.Hour*72))
 
 		if err != nil {
 			t.Fatal(err)

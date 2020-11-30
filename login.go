@@ -2,6 +2,7 @@ package cascade
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,13 +11,13 @@ import (
 )
 
 // Login авторизация пользователя в Каскаде
-func (self *Connection) Login(authURL string, auth Auth) error {
-	if self.client == nil {
-		return fmt.Errorf("POST %s: %v", authURL, ErrorHTTPClientNotSpecified)
+func (c *Connection) Login(authURL string, auth Auth) error {
+	if c.client == nil {
+		return fmt.Errorf("POST %s: %v", authURL, errors.New("no HTTP client"))
 	}
 
-	if self.login != nil {
-		return fmt.Errorf("POST %s: %v", authURL, ErrorUserAuthorized)
+	if c.login != nil {
+		return fmt.Errorf("POST %s: %v", authURL, errors.New("user is already authorized"))
 	}
 
 	if _, err := url.Parse(authURL); err != nil {
@@ -35,13 +36,17 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", auth.Secret()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
-	resp, err := self.client.Do(req)
+	resp, err := c.client.Do(req)
 
 	if err != nil {
 		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.errorCallbackFunc(err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("POST %s: %s", authURL, resp.Status)
@@ -61,19 +66,19 @@ func (self *Connection) Login(authURL string, auth Auth) error {
 		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
-	self.authURL = authURL
-	self.login = &login
+	c.authURL = authURL
+	c.login = &login
 
 	return nil
 }
 
 // Logout закрытие сессии пользователя
-func (self *Connection) Logout() error {
-	if self.login == nil {
+func (c *Connection) Logout() error {
+	if c.login == nil {
 		return nil
 	}
 
-	self.login = nil
+	c.login = nil
 
 	return nil
 }

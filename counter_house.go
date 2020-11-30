@@ -7,12 +7,12 @@ import (
 )
 
 // CounterHouse возвращает список приборов учета
-func (self *Connection) CounterHouse() ([]byte, error) {
-	if err := self.checkConnection(); err != nil {
+func (c *Connection) CounterHouse() ([]byte, error) {
+	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
 	}
 
-	methodURL, err := URLJoin(self.baseURL, CounterHouse)
+	methodURL, err := URLJoin(c.baseURL, CounterHouse)
 
 	if err != nil {
 		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
@@ -24,15 +24,19 @@ func (self *Connection) CounterHouse() ([]byte, error) {
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", self.TokenType(), self.AccessToken()))
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.TokenType(), c.AccessToken()))
 
-	resp, err := self.client.Do(req)
+	resp, err := c.client.Do(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.errorCallbackFunc(err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("GET %s: %s", CounterHouse, resp.Status)
@@ -100,8 +104,8 @@ const (
 )
 
 // Flow возвращает тип подключения
-func (self *CounterHouseChannelDto) Flow() Flow {
-	switch self.Type {
+func (channel *CounterHouseChannelDto) Flow() Flow {
+	switch channel.Type {
 	case inFlow:
 		return FlowDirect
 	case outFlow:
@@ -130,8 +134,8 @@ const (
 )
 
 // Resource возвращает тип ресурса
-func (self *CounterHouseChannelDto) Resource() Resource {
-	switch self.ResourceType {
+func (channel *CounterHouseChannelDto) Resource() Resource {
+	switch channel.ResourceType {
 	case heat:
 		return ResourceHeat
 	case hotWater:

@@ -1,6 +1,7 @@
 package cascade
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -10,6 +11,8 @@ type Connection struct {
 	authURL string
 	client  *http.Client
 	login   *LoginResponse
+
+	OnError func(err error)
 }
 
 // NewConnection возвращает настроенное соединение с Каскадом
@@ -21,36 +24,42 @@ func NewConnection(baseURL string, client *http.Client) *Connection {
 }
 
 // Connected возвращает признак установленного соединения
-func (self *Connection) Connected() bool {
-	return self.login != nil
+func (c *Connection) Connected() bool {
+	return c.login != nil
 }
 
 // AccessToken возвращает токен сессии
-func (self *Connection) AccessToken() string {
-	if self.login == nil {
+func (c *Connection) AccessToken() string {
+	if c.login == nil {
 		return ""
 	}
 
-	return self.login.AccessToken
+	return c.login.AccessToken
 }
 
 // TokenType возвращает тип токена
-func (self *Connection) TokenType() string {
-	if self.login == nil {
+func (c *Connection) TokenType() string {
+	if c.login == nil {
 		return ""
 	}
 
-	return self.login.TokenType
+	return c.login.TokenType
 }
 
-func (self *Connection) checkConnection() error {
-	if self.login == nil {
-		return ErrorUserUnauthorized
+func (c *Connection) checkConnection() error {
+	if c.login == nil {
+		return errors.New("user not authorized")
 	}
 
-	if self.client == nil {
-		return ErrorHTTPClientNotSpecified
+	if c.client == nil {
+		return errors.New("no HTTP client")
 	}
 
 	return nil
+}
+
+func (c *Connection) errorCallbackFunc(err error) {
+	if err != nil && c.OnError != nil {
+		c.OnError(err)
+	}
 }

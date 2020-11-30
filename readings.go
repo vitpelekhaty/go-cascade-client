@@ -6,41 +6,18 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
+
+	"github.com/vitpelekhaty/go-cascade-client/archive"
 )
 
-// DataArchive архив показаний прибора учета
-type DataArchive byte
-
-const (
-	// UnknownArchive неизвестный тип архива
-	UnknownArchive DataArchive = 0
-	// HourArchive часовой архив
-	HourArchive DataArchive = 1
-	// DailyArchive суточный архив
-	DailyArchive DataArchive = 2
-)
-
-// String возвращает строковое описание типа архива показаний
-func (self DataArchive) String() string {
-	switch self {
-	case HourArchive:
-		return "HourArchive"
-	case DailyArchive:
-		return "DailyArchive"
-	default:
-		return "UnknownArchive"
-	}
-}
-
-func (self *Connection) Readings(deviceID int64, archive DataArchive, beginAt, endAt time.Time) ([]byte, error) {
-	if err := self.checkConnection(); err != nil {
+func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time) ([]byte, error) {
+	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("POST %s: %v", Readings, err)
 	}
 
-	methodURL, err := URLJoin(self.baseURL, Readings)
+	methodURL, err := URLJoin(c.baseURL, Readings)
 
 	if err != nil {
 		return nil, fmt.Errorf("POST %s: %v", Readings, err)
@@ -65,16 +42,20 @@ func (self *Connection) Readings(deviceID int64, archive DataArchive, beginAt, e
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", self.TokenType(), self.AccessToken()))
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.TokenType(), c.AccessToken()))
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := self.client.Do(req)
+	resp, err := c.client.Do(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("POST %s: %v", Readings, err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.errorCallbackFunc(err)
+		}
+	}()
 
 	data, err := ioutil.ReadAll(resp.Body)
 
@@ -119,7 +100,7 @@ type ReadingsRequest struct {
 	// DeviceID идентификатор прибора учета
 	DeviceID int64 `json:"deviceId"`
 	// Archive тип архива показаний
-	Archive DataArchive `json:"archiveType"`
+	Archive archive.DataArchive `json:"archiveType"`
 	// BeginAt время начала периода показаний прибора учета
 	BeginAt RequestTime `json:"beginAt"`
 	// EndAt время окончания периода показаний прибора учета
@@ -128,46 +109,22 @@ type ReadingsRequest struct {
 
 const requestTimeLayout = `02.01.2006 15:04:05`
 
-func (self *RequestTime) UnmarshalJSON(b []byte) (err error) {
+func (rt *RequestTime) UnmarshalJSON(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
 	t, err := time.Parse(requestTimeLayout, s)
 
-	*self = RequestTime(t)
+	*rt = RequestTime(t)
 
 	return
 }
 
-func (self RequestTime) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, self.String())), nil
+func (rt RequestTime) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, rt.String())), nil
 }
 
-func (self *RequestTime) String() string {
-	t := time.Time(*self)
+func (rt *RequestTime) String() string {
+	t := time.Time(*rt)
 	return t.Format(requestTimeLayout)
-}
-
-func (self *DataArchive) UnmarshalJSON(b []byte) (err error) {
-	s := strings.Trim(string(b), `"`)
-
-	var i int
-	i, err = strconv.Atoi(s)
-
-	if err != nil {
-		*self = UnknownArchive
-		return
-	}
-
-	switch i {
-	case int(HourArchive):
-		*self = HourArchive
-	case int(DailyArchive):
-		*self = DailyArchive
-	default:
-		*self = UnknownArchive
-		err = fmt.Errorf("unknown archive type %d", i)
-	}
-
-	return
 }
 
 // CounterHouseReadingDto элемент архива показаний
@@ -199,14 +156,14 @@ type CounterHouseReadingDto struct {
 }
 
 // DataArchive возвращает тип архива показаний прибора учета
-func (self *CounterHouseReadingDto) DataArchive() DataArchive {
-	switch int(self.Archive) {
-	case int(HourArchive):
-		return HourArchive
-	case int(DailyArchive):
-		return DailyArchive
+func (counter *CounterHouseReadingDto) DataArchive() archive.DataArchive {
+	switch int(counter.Archive) {
+	case int(archive.HourArchive):
+		return archive.HourArchive
+	case int(archive.DailyArchive):
+		return archive.DailyArchive
 	default:
-		return UnknownArchive
+		return archive.UnknownArchive
 	}
 }
 
