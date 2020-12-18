@@ -201,7 +201,7 @@ func TestConnection_Readings_Hours_422(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = conn.Login(login, auth)
+	err = conn.login(login, auth)
 
 	if err != nil {
 		t.Fatal(err)
@@ -293,7 +293,7 @@ func TestConnection_Readings_Hours_200(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = conn.Login(login, auth)
+	err = conn.login(login, auth)
 
 	if err != nil {
 		t.Fatal(err)

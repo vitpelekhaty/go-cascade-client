@@ -136,7 +136,7 @@ func TestConnection_CounterHouse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = conn.Login(login, auth)
+	err = conn.login(login, auth)
 
 	if err != nil {
 		t.Fatal(err)

@@ -49,12 +49,12 @@ var expiredTestCases = []struct {
 
 func TestLoginResponse_Expired(t *testing.T) {
 	for _, test := range expiredTestCases {
-		login := &LoginResponse{ExpiresIn: test.timestamp}
+		login := &token{expiresIn: test.timestamp}
 
-		have := login.Expired(time.UTC)
+		have := login.expired(time.UTC)
 
 		if have != test.want {
-			t.Errorf("LoginResponse(timestamp: %d) failed: have %v, want %v", test.timestamp, have, test.want)
+			t.Errorf("token(timestamp: %d) failed: have %v, want %v", test.timestamp, have, test.want)
 		}
 	}
 }

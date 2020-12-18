@@ -19,27 +19,27 @@ func (self Auth) Secret() string {
 	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", self.Username, self.Password)))
 }
 
-// LoginResponse ответ сервера авторизации
-type LoginResponse struct {
-	// AccessToken токен сессии
-	AccessToken string `json:"access_token"`
-	// TokenType тип токена (bearer etc)
-	TokenType string `json:"token_type"`
-	// ExpiresIn timestamp времени окончания действия токена
-	ExpiresIn int64 `json:"expires_in"`
-	// Scope ???
-	Scope string `json:"scope"`
-	// UserID идентификатор пользователя в Каскаде
-	UserID int `json:"userid"`
-	// Login имя пользователя
-	Login string `json:"login"`
-	// Name наименование соединения
-	Name string `json:"name"`
-	// ServerType тип сервера (development etc)
-	ServerType string `json:"server_type"`
+// token ответ сервера авторизации
+type token struct {
+	// value токен сессии
+	value string `json:"access_token"`
+	// tokenType тип токена (bearer etc)
+	tokenType string `json:"token_type"`
+	// expiresIn timestamp времени окончания действия токена
+	expiresIn int64 `json:"expires_in"`
+	// scope ???
+	scope string `json:"scope"`
+	// userID идентификатор пользователя в Каскаде
+	userID int `json:"userid"`
+	// user имя пользователя
+	user string `json:"token"`
+	// connectionName наименование соединения
+	connectionName string `json:"name"`
+	// serverType тип сервера (development etc)
+	serverType string `json:"server_type"`
 }
 
-// Expired возвращает время окончания действия токена
-func (self *LoginResponse) Expired(loc *time.Location) time.Time {
-	return time.Unix(self.ExpiresIn, 0).In(loc)
+// expired возвращает время окончания действия токена
+func (self *token) expired(loc *time.Location) time.Time {
+	return time.Unix(self.expiresIn, 0).In(loc)
 }

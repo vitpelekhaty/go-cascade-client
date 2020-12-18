@@ -46,7 +46,7 @@ func TestConnection_LoginLogout_Real(t *testing.T) {
 		t.FailNow()
 	}
 
-	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/login")
+	tracedata := filepath.Join(filepath.Dir(exec), "/testdata/trace/token")
 
 	f, err := os.Create(tracedata)
 
@@ -94,7 +94,7 @@ func TestConnection_LoginLogout_Real(t *testing.T) {
 		}
 	}()
 
-	err = conn.Login(authURL, Auth{Username: username, Password: password})
+	err = conn.login(authURL, Auth{Username: username, Password: password})
 
 	if err != nil {
 		t.Fatal(err)
@@ -158,7 +158,7 @@ func TestConnection_CounterHouse_Real(t *testing.T) {
 		}
 	}()
 
-	err = conn.Login(authURL, Auth{Username: username, Password: password})
+	err = conn.login(authURL, Auth{Username: username, Password: password})
 
 	if err != nil {
 		t.Fatal(err)
@@ -234,7 +234,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 		}
 	}()
 
-	err = conn.Login(authURL, Auth{Username: username, Password: password})
+	err = conn.login(authURL, Auth{Username: username, Password: password})
 
 	if err != nil {
 		t.Fatal(err)
@@ -334,7 +334,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 		}
 	}()
 
-	err = conn.Login(authURL, Auth{Username: username, Password: password})
+	err = conn.login(authURL, Auth{Username: username, Password: password})
 
 	if err != nil {
 		t.Fatal(err)

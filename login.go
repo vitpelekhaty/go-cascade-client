@@ -11,12 +11,8 @@ import (
 )
 
 // Login авторизация пользователя в Каскаде
-func (c *Connection) Login(authURL string, auth Auth) error {
-	if c.client == nil {
-		return fmt.Errorf("POST %s: %v", authURL, errors.New("no HTTP client"))
-	}
-
-	if c.login != nil {
+func (c *Connection) login(authURL string, secret string) error {
+	if c.token != nil {
 		return fmt.Errorf("POST %s: %v", authURL, errors.New("user is already authorized"))
 	}
 
@@ -33,7 +29,7 @@ func (c *Connection) Login(authURL string, auth Auth) error {
 		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", auth.Secret()))
+	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", secret))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	resp, err := c.client.Do(req)
@@ -58,7 +54,7 @@ func (c *Connection) Login(authURL string, auth Auth) error {
 		return fmt.Errorf("POST %s: %v", authURL, err)
 	}
 
-	var login LoginResponse
+	var login token
 
 	err = json.Unmarshal(body, &login)
 
@@ -67,18 +63,7 @@ func (c *Connection) Login(authURL string, auth Auth) error {
 	}
 
 	c.authURL = authURL
-	c.login = &login
-
-	return nil
-}
-
-// Logout закрытие сессии пользователя
-func (c *Connection) Logout() error {
-	if c.login == nil {
-		return nil
-	}
-
-	c.login = nil
+	c.token = &login
 
 	return nil
 }

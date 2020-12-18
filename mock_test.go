@@ -12,7 +12,7 @@ import (
 )
 
 var responses = map[string]string{
-	Login:             "/testdata/responses/login.json",
+	Login:             "/testdata/responses/token.json",
 	CounterHouse:      "/testdata/responses/counterHouse.json",
 	Readings:          "/testdata/responses/readings200.json",
 	Readings + " 422": "/testdata/responses/readings422.json",
@@ -33,7 +33,7 @@ func accessToken() (string, error) {
 		return "", err
 	}
 
-	var login LoginResponse
+	var login token
 
 	err = json.Unmarshal(data, &login)
 
@@ -41,7 +41,7 @@ func accessToken() (string, error) {
 		return "", err
 	}
 
-	return login.AccessToken, nil
+	return login.value, nil
 }
 
 func MockServerFunc(w http.ResponseWriter, r *http.Request) {

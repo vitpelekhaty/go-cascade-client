@@ -1,96 +1,12 @@
 package cascade
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"strings"
 	"time"
 
 	"github.com/vitpelekhaty/go-cascade-client/archive"
 )
-
-func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time) ([]byte, error) {
-	if err := c.checkConnection(); err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
-	}
-
-	methodURL, err := URLJoin(c.baseURL, Readings)
-
-	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
-	}
-
-	readingsRequest := &ReadingsRequest{
-		DeviceID: deviceID,
-		Archive:  archive,
-		BeginAt:  RequestTime(beginAt),
-		EndAt:    RequestTime(endAt),
-	}
-
-	reqData, err := json.Marshal(readingsRequest)
-
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", methodURL, bytes.NewReader(reqData))
-
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.TokenType(), c.AccessToken()))
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
-
-	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
-	}
-
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.errorCallbackFunc(err)
-		}
-	}()
-
-	data, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		var (
-			errorMessage     string
-			errorDescription string
-		)
-
-		if len(data) > 0 {
-			var message Message
-
-			err = json.Unmarshal(data, &message)
-
-			if err != nil {
-				return nil, fmt.Errorf("POST %s %d: %v", Readings, resp.StatusCode, err)
-			}
-
-			errorMessage = message.Text
-			errorDescription = message.Description
-
-			return nil, fmt.Errorf("POST %s %d: %s: %s", Readings, resp.StatusCode, errorMessage,
-				errorDescription)
-
-		}
-
-		return nil, fmt.Errorf("POST %s: %s", Readings, resp.Status)
-	}
-
-	return data, nil
-}
 
 // RequestTime описывает формат времени, принятый в запросах к АИСКУТЭ Каскад
 type RequestTime time.Time
