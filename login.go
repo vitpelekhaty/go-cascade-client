@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// Login авторизация пользователя в Каскаде
+// methodLogin авторизация пользователя в Каскаде
 func (c *Connection) login(authURL string, secret string) error {
 	if c.token != nil {
 		return fmt.Errorf("POST %s: %v", authURL, errors.New("user is already authorized"))

@@ -173,7 +173,7 @@ func TestConnection_CounterHouse_Real(t *testing.T) {
 	}
 
 	if len(devices) == 0 {
-		t.Error("CounterHouse() failed!")
+		t.Error("methodCounterHouse() failed!")
 	}
 }
 
@@ -247,7 +247,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 	}
 
 	if len(ch) == 0 {
-		t.Fatal("hours Readings() failed: CounterHouse() failed!")
+		t.Fatal("hours methodReadings() failed: methodCounterHouse() failed!")
 	}
 
 	var devices []CounterHouseDto
@@ -259,7 +259,7 @@ func TestConnection_Readings_Real_HourArchive(t *testing.T) {
 	}
 
 	if len(devices) == 0 {
-		t.Fatal("hours Readings() failed: no devices!")
+		t.Fatal("hours methodReadings() failed: no devices!")
 	}
 
 	for index, device := range devices {
@@ -347,7 +347,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 	}
 
 	if len(ch) == 0 {
-		t.Fatal("daily Readings() failed: CounterHouse() failed!")
+		t.Fatal("daily methodReadings() failed: methodCounterHouse() failed!")
 	}
 
 	var devices []CounterHouseDto
@@ -359,7 +359,7 @@ func TestConnection_Readings_Real_DailyArchive(t *testing.T) {
 	}
 
 	if len(devices) == 0 {
-		t.Fatal("daily Readings() failed: no devices!")
+		t.Fatal("daily methodReadings() failed: no devices!")
 	}
 
 	for index, device := range devices {

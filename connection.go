@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path"
 	"time"
 
 	"github.com/vitpelekhaty/go-cascade-client/archive"
@@ -22,6 +23,13 @@ func WithAuth(authURL url.URL, auth Auth) Option {
 		c.secret = auth.Secret()
 	}
 }
+
+var (
+	// methodCounterHouse метод получения списка приборов учета
+	methodCounterHouse = "/api/cascade/counter-house"
+	// methodReadings метод чтения архива показаний прибора учета
+	methodReadings = "/api/cascade/counter-house/reading"
+)
 
 // Connection соединение с Каскадом
 type Connection struct {
@@ -76,16 +84,16 @@ func (c *Connection) Connected() bool {
 	return c.token != nil
 }
 
-// CounterHouse возвращает список приборов учета
+// methodCounterHouse возвращает список приборов учета
 func (c *Connection) CounterHouse() ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
-		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
+		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
 
-	methodURL, err := URLJoin(c.baseURL, CounterHouse)
+	methodURL, err := join(c.baseURL, methodCounterHouse)
 
 	if err != nil {
-		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
+		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
 
 	req, err := http.NewRequest("GET", methodURL, nil)
@@ -94,12 +102,12 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.tokenType, c.token.value))
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.Type, c.token.Value))
 
 	resp, err := c.client.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
+		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
 
 	defer func() {
@@ -109,13 +117,13 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET %s: %s", CounterHouse, resp.Status)
+		return nil, fmt.Errorf("GET %s: %s", methodCounterHouse, resp.Status)
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return nil, fmt.Errorf("GET %s: %v", CounterHouse, err)
+		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
 
 	return data, nil
@@ -123,13 +131,13 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 
 func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time) ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
+		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
 	}
 
-	methodURL, err := URLJoin(c.baseURL, Readings)
+	methodURL, err := join(c.baseURL, methodReadings)
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
+		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
 	}
 
 	readingsRequest := &ReadingsRequest{
@@ -151,13 +159,13 @@ func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, begin
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.tokenType, c.token.value))
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.Type, c.token.Value))
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.client.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
+		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
 	}
 
 	defer func() {
@@ -169,33 +177,29 @@ func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, begin
 	data, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", Readings, err)
+		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		var (
-			errorMessage     string
-			errorDescription string
-		)
-
 		if len(data) > 0 {
-			var message Message
+			message := &message{}
 
-			err = json.Unmarshal(data, &message)
+			err = json.Unmarshal(data, message)
 
 			if err != nil {
-				return nil, fmt.Errorf("POST %s %d: %v", Readings, resp.StatusCode, err)
+				return nil, fmt.Errorf("POST %s %d: %v", methodReadings, resp.StatusCode, err)
 			}
 
-			errorMessage = message.Text
-			errorDescription = message.Description
+			ce := message.Err()
 
-			return nil, fmt.Errorf("POST %s %d: %s: %s", Readings, resp.StatusCode, errorMessage,
-				errorDescription)
+			ce.path = methodReadings
+			ce.method = "POST"
+			ce.statusCode = resp.StatusCode
 
+			return nil, ce
 		}
 
-		return nil, fmt.Errorf("POST %s: %s", Readings, resp.Status)
+		return nil, fmt.Errorf("POST %s: %s", methodReadings, resp.Status)
 	}
 
 	return data, nil
@@ -217,4 +221,17 @@ func (c *Connection) errorCallbackFunc(err error) {
 	if err != nil && c.OnError != nil {
 		c.OnError(err)
 	}
+}
+
+// join возвращает полный URI метода API
+func join(baseURL, method string) (string, error) {
+	u, err := url.Parse(baseURL)
+
+	if err != nil {
+		return method, err
+	}
+
+	u.Path = path.Join(u.Path, method)
+
+	return u.String(), nil
 }

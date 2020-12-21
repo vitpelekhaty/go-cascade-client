@@ -1,30 +1,21 @@
 package cascade
 
-import (
-	"time"
-)
-
 // token ответ сервера авторизации
 type token struct {
-	// value токен сессии
-	value string `json:"access_token"`
-	// tokenType тип токена (bearer etc)
-	tokenType string `json:"token_type"`
-	// expiresIn timestamp времени окончания действия токена
-	expiresIn int64 `json:"expires_in"`
-	// scope ???
-	scope string `json:"scope"`
-	// userID идентификатор пользователя в Каскаде
-	userID int `json:"userid"`
-	// user имя пользователя
-	user string `json:"token"`
-	// connectionName наименование соединения
-	connectionName string `json:"name"`
-	// serverType тип сервера (development etc)
-	serverType string `json:"server_type"`
-}
-
-// expired возвращает время окончания действия токена
-func (t *token) expired(loc *time.Location) time.Time {
-	return time.Unix(t.expiresIn, 0).In(loc)
+	// Value токен сессии
+	Value string `json:"access_token"`
+	// Type тип токена (bearer etc)
+	Type string `json:"token_type"`
+	// ExpiresIn timestamp времени окончания действия токена
+	ExpiresIn int64 `json:"expires_in"`
+	// Scope ???
+	Scope string `json:"Scope"`
+	// UserID идентификатор пользователя в Каскаде
+	UserID int `json:"userid"`
+	// User имя пользователя
+	User string `json:"token"`
+	// Connection наименование соединения
+	Connection string `json:"name"`
+	// ServerType тип сервера (development etc)
+	ServerType string `json:"server_type"`
 }
