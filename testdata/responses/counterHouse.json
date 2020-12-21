@@ -1,30 +1,1224 @@
 [
   {
-    "id": 4685,
-    "title": "А. Петрова, 65",
-    "name": "ВЗЛЕТ ТСРВ-033 802548",
-    "serialNumber": "802548",
+    "id": 8830,
+    "title": "Шумакова, 32",
+    "name": "ТМК-Н30 11412",
+    "modelName": "ТМК-Н30",
+    "serialNumber": "11412",
     "inputs": [
       {
-        "number": 0,
+        "number": 1,
         "channels": [
           {
-            "id": 9470,
-            "type": "outFlow",
-            "resourceType": "Heat",
-            "number": 2
-          },
-          {
-            "id": 9471,
+            "id": 9246,
             "type": "inFlow",
             "resourceType": "Heat",
             "number": 1
           },
           {
-            "id": 9472,
+            "id": 9245,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9250,
             "type": "inFlow",
             "resourceType": "HotWater",
             "number": 3
+          },
+          {
+            "id": 9249,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 4
+          },
+          {
+            "id": 16201,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 8736,
+    "title": "Шумакова, 32",
+    "name": "ТМК-Н30 11416",
+    "modelName": "ТМК-Н30",
+    "serialNumber": "11416",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9248,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9247,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9252,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 9251,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 4
+          },
+          {
+            "id": 16202,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5252,
+    "title": "Юрина, 230",
+    "name": "ВЗЛЕТ ТСРВ-026 1001215",
+    "modelName": "ВЗЛЕТ ТСРВ-026",
+    "serialNumber": "1001215",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 19251,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 19250,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 19252,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16204,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10095,
+    "title": "50 лет СССР, 16",
+    "name": "ВЗЛЕТ ТСРВ-043 1901598",
+    "modelName": "ВЗЛЕТ ТСРВ-043",
+    "serialNumber": "1901598",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9069,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9068,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9077,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 9076,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 4
+          },
+          {
+            "id": 16130,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10093,
+    "title": "50 лет СССР, 16",
+    "name": "ВЗЛЕТ ТСРВ-043 1901543",
+    "modelName": "ВЗЛЕТ ТСРВ-043",
+    "serialNumber": "1901543",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9071,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9070,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9079,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 9078,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 4
+          },
+          {
+            "id": 16131,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10094,
+    "title": "50 лет СССР, 16",
+    "name": "ВЗЛЕТ ТСРВ-043 1901577",
+    "modelName": "ВЗЛЕТ ТСРВ-043",
+    "serialNumber": "1901577",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9073,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9072,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9075,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 9074,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 4
+          },
+          {
+            "id": 16132,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10103,
+    "title": "8-й Микрорайон, 32",
+    "name": "СПТ941.10(11) 27746",
+    "modelName": "СПТ941.10(11)",
+    "serialNumber": "27746",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9081,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9080,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16133,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10107,
+    "title": "8-й Микрорайон, 32",
+    "name": "СПТ941.10(11) 27748",
+    "modelName": "СПТ941.10(11)",
+    "serialNumber": "27748",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9083,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9082,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16134,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 541,
+    "title": "А. Петрова, 233",
+    "name": "ТМК-Н3 1300",
+    "modelName": "ТМК-Н3",
+    "serialNumber": "1300",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9085,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9084,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 9091,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 3
+          },
+          {
+            "id": 9090,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 4
+          },
+          {
+            "id": 16135,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 543,
+    "title": "А. Петрова, 233",
+    "name": "ТМК-Н3 1223",
+    "modelName": "ТМК-Н3",
+    "serialNumber": "1223",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9087,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9086,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 9093,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 3
+          },
+          {
+            "id": 9092,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 4
+          },
+          {
+            "id": 16136,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 545,
+    "title": "А. Петрова, 233",
+    "name": "ТМК-Н3 1218",
+    "modelName": "ТМК-Н3",
+    "serialNumber": "1218",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9089,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9088,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 9095,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 3
+          },
+          {
+            "id": 9094,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 4
+          },
+          {
+            "id": 16137,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4685,
+    "title": "А. Петрова, 65",
+    "name": "ВЗЛЕТ ТСРВ-033 802548",
+    "modelName": "ВЗЛЕТ ТСРВ-033",
+    "serialNumber": "802548",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9097,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9096,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9098,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16138,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10017,
+    "title": "Волгоградская, 55",
+    "name": "ТМК-Н1 1393",
+    "modelName": "ТМК-Н1",
+    "serialNumber": "1393",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9110,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9109,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 9112,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 3
+          },
+          {
+            "id": 9111,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 4
+          },
+          {
+            "id": 16143,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5587,
+    "title": "Г. Исакова, 122",
+    "name": "ВЗЛЕТ ТСРВ-034 1216292",
+    "modelName": "ВЗЛЕТ ТСРВ-034",
+    "serialNumber": "1216292",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9117,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9116,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9118,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16145,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 875,
+    "title": "Интернациональная, 72",
+    "name": "ТМК-Н2 01411",
+    "modelName": "ТМК-Н2",
+    "serialNumber": "1411",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9120,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9119,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16146,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 189,
+    "title": "Ленина, 118",
+    "name": "ВКТ-7 120066",
+    "modelName": "ВКТ-7",
+    "serialNumber": "120066",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9130,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9129,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9131,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16148,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 185,
+    "title": "Ленина, 75",
+    "name": "ВКТ-7 154064",
+    "modelName": "ВКТ-7",
+    "serialNumber": "154064",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9133,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9132,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9134,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16149,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5392,
+    "title": "Новосибирская, 16",
+    "name": "ТМК-Н20 820",
+    "modelName": "ТМК-Н20",
+    "serialNumber": "820",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 19130,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 19129,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16150,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4559,
+    "title": "Павловский тракт, 124",
+    "name": "ВЗЛЕТ ТСРВ-026М 1112615",
+    "modelName": "ВЗЛЕТ ТСРВ-026М",
+    "serialNumber": "1112615",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 19132,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 19131,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 19134,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 19133,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 4
+          },
+          {
+            "id": 16151,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 678,
+    "title": "Павловский тракт, 273",
+    "name": "СПТ943 04620",
+    "modelName": "СПТ943",
+    "serialNumber": "4620",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9142,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9141,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16152,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9146,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9145,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16153,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 680,
+    "title": "Павловский тракт, 273",
+    "name": "СПТ943 05860",
+    "modelName": "СПТ943",
+    "serialNumber": "5860",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9144,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9143,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16154,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9148,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9147,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16155,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4373,
+    "title": "Попова, 117",
+    "name": "СПТ944 2021",
+    "modelName": "СПТ944",
+    "serialNumber": "2021",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9150,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9149,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16156,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9152,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9151,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16157,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 701,
+    "title": "Попова, 129",
+    "name": "СПТ943 3165",
+    "modelName": "СПТ943",
+    "serialNumber": "3165",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9154,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9153,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16158,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9156,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9155,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16159,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 8978,
+    "title": "Северный Власихинский, 106",
+    "name": "ВЗЛЕТ ТСРВ-033 1408871",
+    "modelName": "ВЗЛЕТ ТСРВ-033",
+    "serialNumber": "1408871",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9174,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9173,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16169,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 9232,
+    "title": "Северный Власихинский, 106",
+    "name": "СПТ941.20 79204",
+    "modelName": "СПТ941.20",
+    "serialNumber": "79204",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9176,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9175,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9177,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16170,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4333,
+    "title": "Северный Власихинский, 58",
+    "name": "СПТ942 6134",
+    "modelName": "СПТ942",
+    "serialNumber": "6134",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9179,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9178,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16171,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9181,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9180,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16172,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5701,
+    "title": "Сиреневая, 16",
+    "name": "ВКТ-9 6981",
+    "modelName": "ВКТ-9",
+    "serialNumber": "6981",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9183,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9182,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16173,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9189,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9188,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16174,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5700,
+    "title": "Сиреневая, 16",
+    "name": "ВКТ-9 10826",
+    "modelName": "ВКТ-9",
+    "serialNumber": "10826",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9185,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9184,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16175,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9187,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9186,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16176,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 7585,
+    "title": "Строителей, 52",
+    "name": "ТВ7 17052231",
+    "modelName": "ТВ7",
+    "serialNumber": "17052231",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9197,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9196,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16177,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9198,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 16178,
+            "resourceType": "HotWater",
+            "number": 0
           }
         ]
       }
@@ -34,31 +1228,380 @@
     "id": 5278,
     "title": "Телефонная, 50",
     "name": "ВЗЛЕТ ТСРВ-031 720483",
+    "modelName": "ВЗЛЕТ ТСРВ-031",
     "serialNumber": "720483",
     "inputs": [
       {
-        "number": 0,
+        "number": 1,
         "channels": [
           {
-            "id": 9569,
-            "type": "outFlow",
-            "resourceType": "Heat",
-            "number": 2
-          },
-          {
-            "id": 9570,
+            "id": 9200,
             "type": "inFlow",
             "resourceType": "Heat",
             "number": 1
           },
           {
-            "id": 9571,
+            "id": 9199,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9201,
             "type": "inFlow",
             "resourceType": "HotWater",
             "number": 3
+          },
+          {
+            "id": 16179,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 870,
+    "title": "Титова, 9б",
+    "name": "ВКТ-4М 4104",
+    "modelName": "ВКТ-4М",
+    "serialNumber": "4104",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 19197,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 19196,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16180,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 871,
+    "title": "Чайковского, 23а",
+    "name": "ТМК-Н12 1299",
+    "modelName": "ТМК-Н12",
+    "serialNumber": "1299",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 19199,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 19198,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16181,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1991,
+    "title": "Шевченко, 52а",
+    "name": "7КТ 5476",
+    "modelName": "7КТ",
+    "serialNumber": "5476",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 19201,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 19200,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 9204,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 3
+          },
+          {
+            "id": 16182,
+            "resourceType": "None",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1992,
+    "title": "Шевченко, 52а",
+    "name": "7КТ 5572",
+    "modelName": "7КТ",
+    "serialNumber": "5572",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9203,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9202,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16183,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4993,
+    "title": "Шукшина, 24",
+    "name": "ВЗЛЕТ ТСРВ-024М 104184",
+    "modelName": "ВЗЛЕТ ТСРВ-024М",
+    "serialNumber": "104184",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9224,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9223,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16193,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9234,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9233,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16194,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4995,
+    "title": "Шукшина, 24",
+    "name": "ВЗЛЕТ ТСРВ-024М 716862",
+    "modelName": "ВЗЛЕТ ТСРВ-024М",
+    "serialNumber": "716862",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9226,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9225,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16195,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9230,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9229,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16196,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4994,
+    "title": "Шукшина, 24",
+    "name": "ВЗЛЕТ ТСРВ-024М 104741",
+    "modelName": "ВЗЛЕТ ТСРВ-024М",
+    "serialNumber": "104741",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9228,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9227,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16197,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9232,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9231,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16198,
+            "resourceType": "HotWater",
+            "number": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 767,
+    "title": "Шумакова, 14",
+    "name": "СПТ943 5200",
+    "modelName": "СПТ943",
+    "serialNumber": "5200",
+    "inputs": [
+      {
+        "number": 1,
+        "channels": [
+          {
+            "id": 9242,
+            "type": "inFlow",
+            "resourceType": "Heat",
+            "number": 1
+          },
+          {
+            "id": 9241,
+            "type": "outFlow",
+            "resourceType": "Heat",
+            "number": 2
+          },
+          {
+            "id": 16199,
+            "resourceType": "Heat",
+            "number": 0
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "channels": [
+          {
+            "id": 9244,
+            "type": "inFlow",
+            "resourceType": "HotWater",
+            "number": 1
+          },
+          {
+            "id": 9243,
+            "type": "outFlow",
+            "resourceType": "HotWater",
+            "number": 2
+          },
+          {
+            "id": 16200,
+            "resourceType": "HotWater",
+            "number": 0
           }
         ]
       }
     ]
   }
 ]
+
