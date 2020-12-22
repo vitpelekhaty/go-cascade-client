@@ -55,7 +55,7 @@ type CounterHouseReadingDto struct {
 	// Input номер теплового ввода
 	Input null.Int `json:"inputNum"`
 	// DT момент показания
-	DT RequestTime `json:"dt"`
+	DT ReadingTime `json:"dt"`
 	// ID идентификатор показания
 	ID null.Int `json:"id"`
 	// IsBadRow признак "плохой" строки показания (признак нештатной ситуации, зафиксированной на приборе учета)

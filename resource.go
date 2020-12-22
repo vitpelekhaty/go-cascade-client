@@ -10,6 +10,8 @@ const (
 	heat = "Heat"
 	// hotWater тип ресурса - горячая вода
 	hotWater = "HotWater"
+	// none тип ресурса - не указан
+	none = "None"
 )
 
 // Resource тип ресурса
@@ -22,6 +24,8 @@ const (
 	ResourceHeat
 	// ResourceHotWater тип ресурса - горячая вода
 	ResourceHotWater
+	// ResourceNone ресурс не указан (для общего потребления тепловой энергии по тепловому вводу прибора учета)
+	ResourceNone
 )
 
 // UnmarshalJSON реализация интерфейса Unmarshaler для типа Resource
@@ -33,6 +37,8 @@ func (r *Resource) UnmarshalJSON(b []byte) (err error) {
 		*r = ResourceHeat
 	case hotWater:
 		*r = ResourceHotWater
+	case none:
+		*r = ResourceNone
 	default:
 		*r = ResourceUnknown
 		err = fmt.Errorf("unknown resource %s", s)
