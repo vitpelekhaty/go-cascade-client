@@ -75,7 +75,7 @@ type CounterHouseReadingDto struct {
 	// TCW температура холодной воды
 	TCW null.Float `json:"tcw"`
 	// TI время штатной работы прибора учета
-	TI null.Int `json:"ti"`
+	TI null.Float `json:"ti"`
 	// V расход теплоносителя в м3
 	V null.Float `json:"v"`
 }
