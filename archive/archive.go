@@ -35,6 +35,7 @@ func (a DataArchive) String() string {
 	}
 }
 
+// UnmarshalJSON реализация интерфейса Unmarshaler для типа DataArchive
 func (a *DataArchive) UnmarshalJSON(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
 
@@ -49,6 +50,12 @@ func (a *DataArchive) UnmarshalJSON(b []byte) (err error) {
 	}
 
 	return
+}
+
+// MarshalJSON реализация интерфейса Marshaler для типа RequestTime
+func (a DataArchive) MarshalJSON() ([]byte, error) {
+	s := fmt.Sprintf(`"%s"`, a.String())
+	return []byte(s), nil
 }
 
 // Parse преобразование строки в значение DataArchive

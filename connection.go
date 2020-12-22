@@ -17,7 +17,7 @@ import (
 // Option опция соединения с API Cascade
 type Option func(c *Connection)
 
-func WithAuth(authURL url.URL, auth Auth) Option {
+func WithAuth(authURL *url.URL, auth Auth) Option {
 	return func(c *Connection) {
 		c.authURL = authURL.String()
 		c.secret = auth.Secret()

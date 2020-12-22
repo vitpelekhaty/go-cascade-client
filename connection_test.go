@@ -5,8 +5,11 @@ package cascade
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"flag"
+	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -56,8 +59,10 @@ func TestConnection(t *testing.T) {
 		t.Fatal(errors.New("no API URL"))
 	}
 
-	if strings.TrimSpace(authURL) == "" {
-		t.Fatal(errors.New("no auth URL"))
+	aURL, err := url.Parse(authURL)
+
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	start, err := time.Parse(layoutQuery, strStart)
@@ -72,10 +77,10 @@ func TestConnection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	archiveType, err := archive.Parse(strDataArchive)
+	archiveType := archive.Parse(strDataArchive)
 
-	if err != nil {
-		t.Fatal(err)
+	if archiveType == archive.UnknownArchive {
+		t.Fatal(fmt.Errorf("unknown type of archive %s", strDataArchive))
 	}
 
 	timeout, err := time.ParseDuration(strTimeout)
@@ -94,7 +99,7 @@ func TestConnection(t *testing.T) {
 		}
 
 		defer func() {
-			if err := f.WriteString("]"); err != nil {
+			if _, err := f.WriteString("]"); err != nil {
 				t.Error(err)
 			}
 
@@ -123,14 +128,14 @@ func TestConnection(t *testing.T) {
 			}
 
 			if !emptyTrace {
-				_, err = tf.WriteString(",")
+				_, err = f.WriteString(",")
 
 				if err != nil {
 					t.Fatal(err)
 				}
 			}
 
-			_, err = tf.Write(b)
+			_, err = f.Write(b)
 
 			if err != nil {
 				t.Fatal(err)
@@ -139,7 +144,7 @@ func TestConnection(t *testing.T) {
 			emptyTrace = false
 		}
 
-		client = setupTracer(client, setupTracerOptions(bodies, callbackFunc))
+		client = setupTracer(client, setupTracerOptions(bodies, callbackFunc)...)
 	}
 
 	c, err := NewConnection(client)
@@ -148,7 +153,7 @@ func TestConnection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = c.Open(cascadeURL, WithAuth(authURL, Auth{
+	err = c.Open(cascadeURL, WithAuth(aURL, Auth{
 		Username: username,
 		Password: password,
 	}))
@@ -178,7 +183,7 @@ func TestConnection(t *testing.T) {
 			t.Fatal(sensor.error)
 		}
 
-		if limit > 0 && sensorCount > limit {
+		if limit > 0 && sensorCount > int(limit) {
 			continue
 		}
 
@@ -188,7 +193,7 @@ func TestConnection(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		readings := ParseCounterHouseReadingDto()
+		readings := ParseCounterHouseReadingDto(archiveBytes)
 
 		for item := range readings {
 			if item.error != nil {
@@ -212,10 +217,12 @@ func setupHTTPClient(timeout time.Duration, insecureSkipVerify bool) *http.Clien
 
 		client.Transport = transport
 	}
+
+	return client
 }
 
 func setupTracer(client *http.Client, options ...httptracer.Option) *http.Client {
-	return httptracer.Trace(client, options)
+	return httptracer.Trace(client, options...)
 }
 
 func setupTracerOptions(withBodies bool, withCallback httptracer.CallbackFunc) []httptracer.Option {

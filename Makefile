@@ -1,8 +1,10 @@
-.PHONY: test units.test
+.PHONY: test tests
 all: test
 
-units.test:
-	go test -timeout 30s .
+test:
+	@echo "unit testing..."
+	go test -v -timeout 30s
 
-test: units.test
-	go test -timeout 30s . -tags=integration -args ${PARAMS}
+tests:
+	@echo "run all tests..."
+	go test -v -timeout 30s . -tags=integration -args ${params}
