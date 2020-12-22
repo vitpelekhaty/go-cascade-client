@@ -2,7 +2,6 @@ package archive
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -18,37 +17,35 @@ const (
 	DailyArchive DataArchive = 2
 )
 
+const (
+	hourArchive    = "Hour"
+	dailyArchive   = "Day"
+	unknownArchive = "Unknown"
+)
+
 // String возвращает строковое описание типа архива показаний
 func (a DataArchive) String() string {
 	switch a {
 	case HourArchive:
-		return "HourArchive"
+		return hourArchive
 	case DailyArchive:
-		return "DailyArchive"
+		return dailyArchive
 	default:
-		return "UnknownArchive"
+		return unknownArchive
 	}
 }
 
 func (a *DataArchive) UnmarshalJSON(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
 
-	var i int
-	i, err = strconv.Atoi(s)
-
-	if err != nil {
-		*a = UnknownArchive
-		return
-	}
-
-	switch i {
-	case int(HourArchive):
+	switch s {
+	case hourArchive:
 		*a = HourArchive
-	case int(DailyArchive):
+	case dailyArchive:
 		*a = DailyArchive
 	default:
 		*a = UnknownArchive
-		err = fmt.Errorf("unknown archive type %d", i)
+		err = fmt.Errorf("unknown archive type %s", s)
 	}
 
 	return
@@ -57,9 +54,9 @@ func (a *DataArchive) UnmarshalJSON(b []byte) (err error) {
 // Parse преобразование строки в значение DataArchive
 func Parse(archive string) DataArchive {
 	switch archive {
-	case "HourArchive":
+	case hourArchive:
 		return HourArchive
-	case "DailyArchive":
+	case dailyArchive:
 		return DailyArchive
 	default:
 		return UnknownArchive
