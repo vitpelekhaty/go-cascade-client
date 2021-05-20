@@ -50,6 +50,8 @@ type CounterHouseReadingDto struct {
 	Archive archive.DataArchive `json:"archiveType"`
 	// ChannelID идентификатор канала/трубы
 	ChannelID null.Int `json:"channelId"`
+	// CreateAt момент чтения показания
+	CreateAt ReadingTime `json:"createAt"`
 	// DeviceID идентификатор прибора учета
 	DeviceID null.Int `json:"deviceId"`
 	// Input номер теплового ввода

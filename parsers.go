@@ -2,11 +2,12 @@ package cascade
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 )
 
 // ParseCounterHouseDto разбирает ответ метода /api/cascade/counter-house
-func ParseCounterHouseDto(b []byte) <-chan struct {
+func ParseCounterHouseDto(ctx context.Context, b []byte) <-chan struct {
 	*CounterHouseDto
 	error
 } {
@@ -15,7 +16,7 @@ func ParseCounterHouseDto(b []byte) <-chan struct {
 		error
 	})
 
-	go func() {
+	go func(b []byte) {
 		defer close(out)
 
 		decoder := json.NewDecoder(bytes.NewReader(b))
@@ -23,37 +24,40 @@ func ParseCounterHouseDto(b []byte) <-chan struct {
 		_, err := decoder.Token()
 
 		if err != nil {
-			out <- struct {
-				*CounterHouseDto
-				error
-			}{nil, err}
-
 			return
 		}
 
-		for decoder.More() {
-			var counterHouse CounterHouseDto
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if !decoder.More() {
+					return
+				}
 
-			if err := decoder.Decode(&counterHouse); err != nil {
-				out <- struct {
-					*CounterHouseDto
-					error
-				}{nil, err}
-				break
-			} else {
-				out <- struct {
-					*CounterHouseDto
-					error
-				}{&counterHouse, nil}
+				var counterHouse CounterHouseDto
+
+				if err := decoder.Decode(&counterHouse); err != nil {
+					out <- struct {
+						*CounterHouseDto
+						error
+					}{nil, err}
+				} else {
+					out <- struct {
+						*CounterHouseDto
+						error
+					}{&counterHouse, nil}
+				}
 			}
 		}
-	}()
+	}(b)
 
 	return out
 }
 
 // ParseCounterHouseReadingDto разбирает ответ метода /api/cascade/counter-house/readings
-func ParseCounterHouseReadingDto(b []byte) <-chan struct {
+func ParseCounterHouseReadingDto(ctx context.Context, b []byte) <-chan struct {
 	*CounterHouseReadingDto
 	error
 } {
@@ -62,7 +66,7 @@ func ParseCounterHouseReadingDto(b []byte) <-chan struct {
 		error
 	})
 
-	go func() {
+	go func(b []byte) {
 		defer close(out)
 
 		decoder := json.NewDecoder(bytes.NewReader(b))
@@ -70,31 +74,34 @@ func ParseCounterHouseReadingDto(b []byte) <-chan struct {
 		_, err := decoder.Token()
 
 		if err != nil {
-			out <- struct {
-				*CounterHouseReadingDto
-				error
-			}{nil, err}
-
 			return
 		}
 
-		for decoder.More() {
-			var reading CounterHouseReadingDto
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if !decoder.More() {
+					return
+				}
 
-			if err := decoder.Decode(&reading); err != nil {
-				out <- struct {
-					*CounterHouseReadingDto
-					error
-				}{nil, err}
-				break
-			} else {
-				out <- struct {
-					*CounterHouseReadingDto
-					error
-				}{&reading, nil}
+				var reading CounterHouseReadingDto
+
+				if err := decoder.Decode(&reading); err != nil {
+					out <- struct {
+						*CounterHouseReadingDto
+						error
+					}{nil, err}
+				} else {
+					out <- struct {
+						*CounterHouseReadingDto
+						error
+					}{&reading, nil}
+				}
 			}
 		}
-	}()
+	}(b)
 
 	return out
 }
