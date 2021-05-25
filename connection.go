@@ -29,6 +29,8 @@ var (
 	methodCounterHouse = "/api/cascade/counter-house"
 	// methodReadings метод чтения архива показаний прибора учета
 	methodReadings = "/api/cascade/counter-house/reading"
+	// methodChangedReadings метод чтения архива измененных показаний прибора учета за предыдущие даты опроса
+	methodChangedReadings = "/api/cascade/counter-house/reading/created"
 )
 
 // Connection соединение с Каскадом
@@ -84,7 +86,7 @@ func (c *Connection) Connected() bool {
 	return c.token != nil
 }
 
-// methodCounterHouse возвращает список приборов учета
+// CounterHouse возвращает список приборов учета
 func (c *Connection) CounterHouse() ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
@@ -129,6 +131,10 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 	return data, nil
 }
 
+// Readings возвращает архив показаний типа archive прибора учета за указанный период beginAt и endAt по прибору учета
+// deviceID и по его тепловому вводу inputNum.
+//
+// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
 func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time,
 	inputNum ...byte) ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
@@ -205,6 +211,91 @@ func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, begin
 		}
 
 		return nil, fmt.Errorf("POST %s: %s", methodReadings, resp.Status)
+	}
+
+	return data, nil
+}
+
+// ChangedReadings возвращает архив измененных показаний типа archive прибора учета, изменение которых произошло за
+// указанный период beginCreateAt и endCreateAt по прибору учета deviceID и по его тепловому вводу inputNum.
+//
+// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
+func (c *Connection) ChangedReadings(deviceID int64, archive archive.DataArchive, beginCreateAt, endCreateAt time.Time,
+	inputNum ...byte) ([]byte, error) {
+	if err := c.checkConnection(); err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
+	}
+
+	methodURL, err := join(c.baseURL, methodChangedReadings)
+
+	if err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
+	}
+
+	readingsRequest := &ChangedReadingsRequest{
+		DeviceID:      deviceID,
+		Archive:       archive,
+		BeginCreateAt: RequestTime(beginCreateAt),
+		EndCreateAt:   RequestTime(endCreateAt),
+	}
+
+	if len(inputNum) > 0 {
+		readingsRequest.InputNum = inputNum[0]
+	}
+
+	reqData, err := json.Marshal(readingsRequest)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", methodURL, bytes.NewReader(reqData))
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.Type, c.token.Value))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+
+	if err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
+	}
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.errorCallbackFunc(err)
+		}
+	}()
+
+	data, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		if len(data) > 0 {
+			message := &message{}
+
+			err = json.Unmarshal(data, message)
+
+			if err != nil {
+				return nil, fmt.Errorf("POST %s %d: %v", methodChangedReadings, resp.StatusCode, err)
+			}
+
+			ce := message.Err()
+
+			ce.path = methodReadings
+			ce.method = "POST"
+			ce.statusCode = resp.StatusCode
+
+			return nil, ce
+		}
+
+		return nil, fmt.Errorf("POST %s: %s", methodChangedReadings, resp.Status)
 	}
 
 	return data, nil
