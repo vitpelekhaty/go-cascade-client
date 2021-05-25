@@ -1,6 +1,7 @@
 package cascade
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 )
 
 // methodLogin авторизация пользователя в Каскаде
-func (c *Connection) login(authURL string, secret string) error {
+func (c *Connection) login(ctx context.Context, authURL string, secret string) error {
 	if c.token != nil {
 		return fmt.Errorf("POST %s: %v", authURL, errors.New("user is already authorized"))
 	}
@@ -23,7 +24,7 @@ func (c *Connection) login(authURL string, secret string) error {
 	form := url.Values{}
 	form.Add("grant_type", "client_credentials")
 
-	req, err := http.NewRequest("POST", authURL, strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", authURL, strings.NewReader(form.Encode()))
 
 	if err != nil {
 		return fmt.Errorf("POST %s: %v", authURL, err)

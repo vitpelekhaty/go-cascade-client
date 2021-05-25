@@ -2,6 +2,7 @@ package cascade
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -59,6 +60,11 @@ func NewConnection(client *http.Client) (*Connection, error) {
 
 // Open открывает соединение с API Cascade
 func (c *Connection) Open(rawURL string, options ...Option) error {
+	return c.OpenWithContext(context.Background(), rawURL, options...)
+}
+
+// OpenWithContext открывает соединение с API Cascade
+func (c *Connection) OpenWithContext(ctx context.Context, rawURL string, options ...Option) error {
 	_, err := url.Parse(rawURL)
 
 	if err != nil {
@@ -71,7 +77,7 @@ func (c *Connection) Open(rawURL string, options ...Option) error {
 		option(c)
 	}
 
-	return c.login(c.authURL, c.secret)
+	return c.login(ctx, c.authURL, c.secret)
 }
 
 func (c *Connection) Close() error {
@@ -88,6 +94,11 @@ func (c *Connection) Connected() bool {
 
 // CounterHouse возвращает список приборов учета
 func (c *Connection) CounterHouse() ([]byte, error) {
+	return c.CounterHouseWithContext(context.Background())
+}
+
+// CounterHouseWithContext возвращает список приборов учета
+func (c *Connection) CounterHouseWithContext(ctx context.Context) ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
@@ -98,7 +109,7 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
 
-	req, err := http.NewRequest("GET", methodURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", methodURL, nil)
 
 	if err != nil {
 		return nil, err
@@ -137,6 +148,15 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 // Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
 func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time,
 	inputNum ...byte) ([]byte, error) {
+	return c.ReadingsWithContext(context.Background(), deviceID, archive, beginAt, endAt, inputNum...)
+}
+
+// ReadingsWithContext возвращает архив показаний типа archive прибора учета за указанный период beginAt и endAt по
+// прибору учета deviceID и по его тепловому вводу inputNum.
+//
+// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
+func (c *Connection) ReadingsWithContext(ctx context.Context, deviceID int64, archive archive.DataArchive, beginAt,
+	endAt time.Time, inputNum ...byte) ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
 	}
@@ -164,7 +184,7 @@ func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, begin
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", methodURL, bytes.NewReader(reqData))
+	req, err := http.NewRequestWithContext(ctx, "POST", methodURL, bytes.NewReader(reqData))
 
 	if err != nil {
 		return nil, err
@@ -222,6 +242,17 @@ func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, begin
 // Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
 func (c *Connection) ChangedReadings(deviceID int64, archive archive.DataArchive, beginCreateAt, endCreateAt time.Time,
 	inputNum ...byte) ([]byte, error) {
+	return c.ChangedReadingsWithContext(context.Background(), deviceID, archive, beginCreateAt, endCreateAt,
+		inputNum...)
+}
+
+// ChangedReadingsWithContext возвращает архив измененных показаний типа archive прибора учета, изменение которых
+// произошло за указанный период beginCreateAt и endCreateAt по прибору учета deviceID и по его тепловому вводу
+// inputNum.
+//
+// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
+func (c *Connection) ChangedReadingsWithContext(ctx context.Context, deviceID int64, archive archive.DataArchive,
+	beginCreateAt, endCreateAt time.Time, inputNum ...byte) ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
 	}
@@ -249,7 +280,7 @@ func (c *Connection) ChangedReadings(deviceID int64, archive archive.DataArchive
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", methodURL, bytes.NewReader(reqData))
+	req, err := http.NewRequestWithContext(ctx, "POST", methodURL, bytes.NewReader(reqData))
 
 	if err != nil {
 		return nil, err
