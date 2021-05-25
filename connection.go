@@ -129,7 +129,8 @@ func (c *Connection) CounterHouse() ([]byte, error) {
 	return data, nil
 }
 
-func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time) ([]byte, error) {
+func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time,
+	inputNum ...byte) ([]byte, error) {
 	if err := c.checkConnection(); err != nil {
 		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
 	}
@@ -145,6 +146,10 @@ func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, begin
 		Archive:  archive,
 		BeginAt:  RequestTime(beginAt),
 		EndAt:    RequestTime(endAt),
+	}
+
+	if len(inputNum) > 0 {
+		readingsRequest.InputNum = inputNum[0]
 	}
 
 	reqData, err := json.Marshal(readingsRequest)

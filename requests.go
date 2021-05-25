@@ -8,6 +8,8 @@ import (
 type ReadingsRequest struct {
 	// DeviceID идентификатор прибора учета
 	DeviceID int64 `json:"deviceId"`
+	// InputNum номер теплового ввода
+	InputNum byte `json:"inputNum,omitempty"`
 	// Archive тип архива показаний
 	Archive archive.DataArchive `json:"archiveType"`
 	// BeginAt время начала периода показаний прибора учета
