@@ -81,7 +81,7 @@ type CounterHouseReadingDto struct {
 	// V расход теплоносителя в м3
 	V null.Float `json:"v"`
 	// Empty признак "пустой" строки показания
-	Empty bool `json:"isEmpty"`
+	Empty null.Bool `json:"isEmpty,omitempty"`
 }
 
 // message сообщение сервера об ошибке
