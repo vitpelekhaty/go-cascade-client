@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package cascade
@@ -19,7 +20,7 @@ import (
 	"github.com/dustin/go-humanize/english"
 	"github.com/vitpelekhaty/httptracer"
 
-	"github.com/vitpelekhaty/go-cascade-client/archive"
+	"github.com/vitpelekhaty/go-cascade-client/v2/archive"
 )
 
 var (

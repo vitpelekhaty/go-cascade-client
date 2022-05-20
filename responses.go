@@ -1,11 +1,9 @@
 package cascade
 
 import (
-	"strings"
-
 	"github.com/guregu/null"
 
-	"github.com/vitpelekhaty/go-cascade-client/archive"
+	"github.com/vitpelekhaty/go-cascade-client/v2/archive"
 )
 
 // CounterHouseDto элемент списка приборов учета
@@ -82,33 +80,4 @@ type CounterHouseReadingDto struct {
 	V null.Float `json:"v"`
 	// Empty признак "пустой" строки показания
 	Empty null.Bool `json:"isEmpty,omitempty"`
-}
-
-// message сообщение сервера об ошибке
-type message struct {
-	// Message текст ошибки
-	Message null.String `json:"message"`
-	// Description описание ошибки
-	Description null.String `json:"description"`
-	// Error текст ошибки
-	Error null.String `json:"error"`
-	// Exception тип исключения
-	Exception null.String `json:"exception"`
-	// Status статус исключения
-	Status null.String `json:"status"`
-}
-
-func (m *message) Err() *ErrCascadeCall {
-	e := &ErrCascadeCall{
-		exception:   m.Exception.ValueOrZero(),
-		message:     m.Message.ValueOrZero(),
-		description: m.Description.ValueOrZero(),
-		status:      m.Status.ValueOrZero(),
-	}
-
-	if len(strings.TrimSpace(e.message)) == 0 {
-		e.message = m.Error.ValueOrZero()
-	}
-
-	return e
 }

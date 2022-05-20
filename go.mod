@@ -1,4 +1,4 @@
-module github.com/vitpelekhaty/go-cascade-client
+module github.com/vitpelekhaty/go-cascade-client/v2
 
 go 1.14
 

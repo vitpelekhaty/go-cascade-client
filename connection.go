@@ -9,165 +9,252 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"path"
+	"strings"
 	"time"
 
-	"github.com/vitpelekhaty/go-cascade-client/archive"
+	"github.com/vitpelekhaty/go-cascade-client/v2/archive"
 )
 
-// Option опция соединения с API Cascade
-type Option func(c *Connection)
+// IConnection интерфейс соединения с API Каскада
+type IConnection interface {
+	// Open открывает соединение с API Каскада
+	Open(ctx context.Context, rawURL, username, passwd string, options ...OpenOption) error
 
-func WithAuth(authURL *url.URL, auth Auth) Option {
-	return func(c *Connection) {
-		c.authURL = authURL.String()
-		c.secret = auth.Secret()
-	}
-}
+	// Close закрывает соединение с API Каскада
+	Close(ctx context.Context) error
 
-var (
-	// methodCounterHouse метод получения списка приборов учета
-	methodCounterHouse = "/api/cascade/counter-house"
-	// methodReadings метод чтения архива показаний прибора учета
-	methodReadings = "/api/cascade/counter-house/reading"
-	// methodChangedReadings метод чтения архива измененных показаний прибора учета за предыдущие даты опроса
-	methodChangedReadings = "/api/cascade/counter-house/reading/created"
-)
+	// Connected возвращает текущее состояние соединения с API Каскада
+	Connected() bool
 
-// Connection соединение с Каскадом
-type Connection struct {
-	baseURL string
-	client  *http.Client
+	// Gauges возвращает список доступных приборов учета с тепловыми вводами и каналами
+	Gauges(ctx context.Context) ([]byte, error)
 
-	token *token
+	// CurrentReadings возвращает текущие показания прибора учета за указанный период. Если указан номер теплового
+	// ввода, то возвращаются показания по этому вводу прибора учета
+	CurrentReadings(ctx context.Context, deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time,
+		inputNum ...byte) ([]byte, error)
 
-	authURL string
-	secret  string
-
-	OnError func(err error)
+	// AlteredReadings возвращает измененные показания прибора учета за указанный период. Если указан номер теплового
+	// ввода, то возвращаются показания по этому вводу прибора учета
+	AlteredReadings(ctx context.Context, deviceID int64, archive archive.DataArchive, beginCreateAt,
+		endCreateAt time.Time, inputNum ...byte) ([]byte, error)
 }
 
 // NewConnection возвращает настроенное соединение с Каскадом
-func NewConnection(client *http.Client) (*Connection, error) {
-	if client == nil {
-		return nil, errors.New("undefined HTTP client")
+func NewConnection(options ...Option) (IConnection, error) {
+	opts := &connOptions{}
+
+	for _, option := range options {
+		option(opts)
 	}
 
-	return &Connection{
-		client: client,
-	}, nil
+	conn := &connection{
+		client: opts.client,
+	}
+
+	if conn.client == nil {
+		conn.client = &http.Client{}
+	}
+
+	return conn, nil
 }
 
-// Open открывает соединение с API Cascade
-func (c *Connection) Open(rawURL string, options ...Option) error {
-	return c.OpenWithContext(context.Background(), rawURL, options...)
+var _ IConnection = (*connection)(nil)
+
+// connection соединение с Каскадом
+type connection struct {
+	rawURL, authURL string
+	secret          string
+	client          *http.Client
+	token           *token
 }
 
-// OpenWithContext открывает соединение с API Cascade
-func (c *Connection) OpenWithContext(ctx context.Context, rawURL string, options ...Option) error {
+// Open открывает соединение с API Каскада
+func (conn *connection) Open(ctx context.Context, rawURL, username, passwd string, options ...OpenOption) error {
 	_, err := url.Parse(rawURL)
 
 	if err != nil {
 		return err
 	}
 
-	c.baseURL = rawURL
+	conn.rawURL = rawURL
+	conn.authURL = rawURL
+
+	opts := &openOptions{}
 
 	for _, option := range options {
-		option(c)
+		option(opts)
 	}
 
-	return c.login(ctx, c.authURL, c.secret)
+	if opts.authURL != conn.authURL {
+		conn.authURL = opts.authURL
+	}
+
+	conn.secret = secret(username, passwd)
+
+	return conn.login(ctx, conn.authURL, conn.secret)
 }
 
-func (c *Connection) Close() error {
-	c.token = nil
-	c.secret = ""
+// login авторизация пользователя в Каскаде
+func (conn *connection) login(ctx context.Context, authURL string, secret string) error {
+	if _, err := url.Parse(authURL); err != nil {
+		return fmt.Errorf("POST %s: %v", authURL, err)
+	}
+
+	form := url.Values{}
+	form.Add("grant_type", "client_credentials")
+
+	req, err := http.NewRequestWithContext(ctx, "POST", authURL, strings.NewReader(form.Encode()))
+
+	if err != nil {
+		return fmt.Errorf("POST %s: %v", authURL, err)
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", secret))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	resp, err := conn.client.Do(req)
+
+	if err != nil {
+		return fmt.Errorf("POST %s: %v", authURL, err)
+	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("POST %s: %s", authURL, resp.Status)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return fmt.Errorf("POST %s: %v", authURL, err)
+	}
+
+	var t token
+
+	err = json.Unmarshal(body, &t)
+
+	if err != nil {
+		return fmt.Errorf("POST %s: %v", authURL, err)
+	}
+
+	conn.token = &t
+
+	return nil
+}
+
+// Close закрывает соединение с API Каскада
+func (conn *connection) Close(_ context.Context) error {
+	conn.token = nil
+	conn.secret = ""
 
 	return nil
 }
 
 // Connected возвращает признак установленного соединения
-func (c *Connection) Connected() bool {
-	return c.token != nil
+func (conn *connection) Connected() bool {
+	return conn.token != nil
 }
 
-// CounterHouse возвращает список приборов учета
-func (c *Connection) CounterHouse() ([]byte, error) {
-	return c.CounterHouseWithContext(context.Background())
-}
+// methodGauges метод получения списка приборов учета
+const methodGauges = "/api/cascade/counter-house"
 
-// CounterHouseWithContext возвращает список приборов учета
-func (c *Connection) CounterHouseWithContext(ctx context.Context) ([]byte, error) {
-	if err := c.checkConnection(); err != nil {
-		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
+// Gauges возвращает список доступных приборов учета с тепловыми вводами и каналами
+func (conn *connection) Gauges(ctx context.Context) ([]byte, error) {
+	if err := conn.checkConnection(); err != nil {
+		return nil, fmt.Errorf("GET %s: %v", methodGauges, err)
 	}
 
-	methodURL, err := join(c.baseURL, methodCounterHouse)
+	methodURL, err := pathJoin(conn.rawURL, methodGauges)
 
 	if err != nil {
-		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
+		return nil, fmt.Errorf("GET %s: %v", methodGauges, err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", methodURL, nil)
+	var headers = map[string]string{
+		"Authorization": fmt.Sprintf("%s %s", conn.token.Type, conn.token.Value),
+	}
+
+	data, statusCode, err := conn.gauges(ctx, methodURL, headers)
 
 	if err != nil {
-		return nil, err
-	}
+		if statusCode == http.StatusUnauthorized {
+			err = conn.login(ctx, conn.authURL, conn.secret)
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.Type, c.token.Value))
+			if err != nil {
+				return nil, fmt.Errorf("GET %s: %v", methodGauges, err)
+			}
 
-	resp, err := c.client.Do(req)
+			data, statusCode, err = conn.gauges(ctx, methodURL, headers)
 
-	if err != nil {
-		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
-	}
-
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.errorCallbackFunc(err)
+			if err != nil {
+				return nil, fmt.Errorf("GET %s: %v", methodGauges, err)
+			}
+		} else {
+			return nil, fmt.Errorf("GET %s: %v", methodGauges, err)
 		}
-	}()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET %s: %s", methodCounterHouse, resp.Status)
-	}
-
-	data, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("GET %s: %v", methodCounterHouse, err)
 	}
 
 	return data, nil
 }
 
-// Readings возвращает архив показаний типа archive прибора учета за указанный период beginAt и endAt по прибору учета
-// deviceID и по его тепловому вводу inputNum.
-//
-// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
-func (c *Connection) Readings(deviceID int64, archive archive.DataArchive, beginAt, endAt time.Time,
-	inputNum ...byte) ([]byte, error) {
-	return c.ReadingsWithContext(context.Background(), deviceID, archive, beginAt, endAt, inputNum...)
-}
-
-// ReadingsWithContext возвращает архив показаний типа archive прибора учета за указанный период beginAt и endAt по
-// прибору учета deviceID и по его тепловому вводу inputNum.
-//
-// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
-func (c *Connection) ReadingsWithContext(ctx context.Context, deviceID int64, archive archive.DataArchive, beginAt,
-	endAt time.Time, inputNum ...byte) ([]byte, error) {
-	if err := c.checkConnection(); err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
-	}
-
-	methodURL, err := join(c.baseURL, methodReadings)
+func (conn *connection) gauges(ctx context.Context, rawURL string, headers map[string]string) ([]byte, int, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", rawURL, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
+		return nil, http.StatusOK, err
 	}
 
-	readingsRequest := &ReadingsRequest{
+	if len(headers) > 0 {
+		for key, value := range headers {
+			req.Header.Set(key, value)
+		}
+	}
+
+	resp, err := conn.client.Do(req)
+
+	if err != nil {
+		return nil, -1, err
+	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, resp.StatusCode, errors.New(resp.Status)
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, resp.StatusCode, err
+	}
+
+	return data, resp.StatusCode, nil
+}
+
+// methodCurrentReadings метод чтения архива показаний прибора учета
+const methodCurrentReadings = "/api/cascade/counter-house/reading"
+
+// CurrentReadings возвращает текущие показания прибора учета за указанный период. Если указан номер теплового
+// ввода, то возвращаются показания по этому вводу прибора учета
+func (conn *connection) CurrentReadings(ctx context.Context, deviceID int64, archive archive.DataArchive, beginAt,
+	endAt time.Time, inputNum ...byte) ([]byte, error) {
+	if err := conn.checkConnection(); err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodCurrentReadings, err)
+	}
+
+	methodURL, err := pathJoin(conn.rawURL, methodCurrentReadings)
+
+	if err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodCurrentReadings, err)
+	}
+
+	readingsRequest := &CurrentReadingsRequest{
 		DeviceID: deviceID,
 		Archive:  archive,
 		BeginAt:  RequestTime(beginAt),
@@ -184,86 +271,105 @@ func (c *Connection) ReadingsWithContext(ctx context.Context, deviceID int64, ar
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", methodURL, bytes.NewReader(reqData))
-
-	if err != nil {
-		return nil, err
+	var headers = map[string]string{
+		"Authorization": fmt.Sprintf("%s %s", conn.token.Type, conn.token.Value),
+		"Content-Type":  "application/json",
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.Type, c.token.Value))
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
+	data, statusCode, err := conn.readings(ctx, methodURL, headers, reqData)
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
-	}
-
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.errorCallbackFunc(err)
-		}
-	}()
-
-	data, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodReadings, err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		if len(data) > 0 {
-			message := &message{}
-
-			err = json.Unmarshal(data, message)
+		if statusCode == http.StatusUnauthorized {
+			err = conn.login(ctx, conn.authURL, conn.secret)
 
 			if err != nil {
-				return nil, fmt.Errorf("POST %s %d: %v", methodReadings, resp.StatusCode, err)
+				return nil, fmt.Errorf("GET %s: %v", methodCurrentReadings, err)
 			}
 
-			ce := message.Err()
+			data, statusCode, err = conn.readings(ctx, methodURL, headers, reqData)
 
-			ce.path = methodReadings
-			ce.method = "POST"
-			ce.statusCode = resp.StatusCode
+			if err != nil {
+				return nil, fmt.Errorf("GET %s: %v", methodCurrentReadings, err)
+			}
+		} else {
+			return nil, fmt.Errorf("GET %s: %v", methodCurrentReadings, err)
+		}
+	}
 
-			return nil, ce
+	if statusCode != http.StatusOK {
+		if len(data) > 0 {
+			var m errorMessage
+
+			err = json.Unmarshal(data, &m)
+
+			if err != nil {
+				return nil, fmt.Errorf("POST %s %d: %v", methodCurrentReadings, statusCode, err)
+			}
+
+			return nil, NewCascadeError(&m, "POST", methodCurrentReadings, statusCode)
 		}
 
-		return nil, fmt.Errorf("POST %s: %s", methodReadings, resp.Status)
+		return nil, fmt.Errorf("POST %s: %s", methodCurrentReadings, http.StatusText(statusCode))
 	}
 
 	return data, nil
 }
 
-// ChangedReadings возвращает архив измененных показаний типа archive прибора учета, изменение которых произошло за
-// указанный период beginCreateAt и endCreateAt по прибору учета deviceID и по его тепловому вводу inputNum.
-//
-// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
-func (c *Connection) ChangedReadings(deviceID int64, archive archive.DataArchive, beginCreateAt, endCreateAt time.Time,
-	inputNum ...byte) ([]byte, error) {
-	return c.ChangedReadingsWithContext(context.Background(), deviceID, archive, beginCreateAt, endCreateAt,
-		inputNum...)
-}
-
-// ChangedReadingsWithContext возвращает архив измененных показаний типа archive прибора учета, изменение которых
-// произошло за указанный период beginCreateAt и endCreateAt по прибору учета deviceID и по его тепловому вводу
-// inputNum.
-//
-// Если inputNum не указан, то метод возвращает архив показаний по всем тепловым вводам прибора учета
-func (c *Connection) ChangedReadingsWithContext(ctx context.Context, deviceID int64, archive archive.DataArchive,
-	beginCreateAt, endCreateAt time.Time, inputNum ...byte) ([]byte, error) {
-	if err := c.checkConnection(); err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
-	}
-
-	methodURL, err := join(c.baseURL, methodChangedReadings)
+func (conn *connection) readings(ctx context.Context, rawURL string, headers map[string]string,
+	payload []byte) ([]byte, int, error) {
+	req, err := http.NewRequestWithContext(ctx, "POST", rawURL, bytes.NewReader(payload))
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
+		return nil, http.StatusOK, err
 	}
 
-	readingsRequest := &ChangedReadingsRequest{
+	if len(headers) > 0 {
+		for key, value := range headers {
+			req.Header.Set(key, value)
+		}
+	}
+
+	resp, err := conn.client.Do(req)
+
+	if err != nil {
+		return nil, -1, err
+	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, resp.StatusCode, errors.New(resp.Status)
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, resp.StatusCode, err
+	}
+
+	return data, resp.StatusCode, nil
+}
+
+// methodAlteredReadings метод чтения архива измененных показаний прибора учета за предыдущие даты опроса
+const methodAlteredReadings = "/api/cascade/counter-house/reading/created"
+
+// AlteredReadings возвращает измененные показания прибора учета за указанный период. Если указан номер теплового
+// ввода, то возвращаются показания по этому вводу прибора учета
+func (conn *connection) AlteredReadings(ctx context.Context, deviceID int64, archive archive.DataArchive,
+	beginCreateAt, endCreateAt time.Time, inputNum ...byte) ([]byte, error) {
+	if err := conn.checkConnection(); err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodAlteredReadings, err)
+	}
+
+	methodURL, err := pathJoin(conn.rawURL, methodAlteredReadings)
+
+	if err != nil {
+		return nil, fmt.Errorf("POST %s: %v", methodAlteredReadings, err)
+	}
+
+	readingsRequest := &AlteredReadingsRequest{
 		DeviceID:      deviceID,
 		Archive:       archive,
 		BeginCreateAt: RequestTime(beginCreateAt),
@@ -280,85 +386,58 @@ func (c *Connection) ChangedReadingsWithContext(ctx context.Context, deviceID in
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", methodURL, bytes.NewReader(reqData))
-
-	if err != nil {
-		return nil, err
+	var headers = map[string]string{
+		"Authorization": fmt.Sprintf("%s %s", conn.token.Type, conn.token.Value),
+		"Content-Type":  "application/json",
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", c.token.Type, c.token.Value))
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
+	data, statusCode, err := conn.readings(ctx, methodURL, headers, reqData)
 
 	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
-	}
-
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.errorCallbackFunc(err)
-		}
-	}()
-
-	data, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("POST %s: %v", methodChangedReadings, err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		if len(data) > 0 {
-			message := &message{}
-
-			err = json.Unmarshal(data, message)
+		if statusCode == http.StatusUnauthorized {
+			err = conn.login(ctx, conn.authURL, conn.secret)
 
 			if err != nil {
-				return nil, fmt.Errorf("POST %s %d: %v", methodChangedReadings, resp.StatusCode, err)
+				return nil, fmt.Errorf("GET %s: %v", methodAlteredReadings, err)
 			}
 
-			ce := message.Err()
+			data, statusCode, err = conn.readings(ctx, methodURL, headers, reqData)
 
-			ce.path = methodReadings
-			ce.method = "POST"
-			ce.statusCode = resp.StatusCode
+			if err != nil {
+				return nil, fmt.Errorf("GET %s: %v", methodAlteredReadings, err)
+			}
+		} else {
+			return nil, fmt.Errorf("GET %s: %v", methodAlteredReadings, err)
+		}
+	}
 
-			return nil, ce
+	if statusCode != http.StatusOK {
+		if len(data) > 0 {
+			var m errorMessage
+
+			err = json.Unmarshal(data, &m)
+
+			if err != nil {
+				return nil, fmt.Errorf("POST %s %d: %v", methodAlteredReadings, statusCode, err)
+			}
+
+			return nil, NewCascadeError(&m, "POST", methodAlteredReadings, statusCode)
 		}
 
-		return nil, fmt.Errorf("POST %s: %s", methodChangedReadings, resp.Status)
+		return nil, fmt.Errorf("POST %s: %s", methodAlteredReadings, http.StatusText(statusCode))
 	}
 
 	return data, nil
 }
 
-func (c *Connection) checkConnection() error {
-	if c.token == nil {
+func (conn *connection) checkConnection() error {
+	if conn.token == nil {
 		return errors.New("user not authorized")
 	}
 
-	if c.client == nil {
+	if conn.client == nil {
 		return errors.New("no HTTP client")
 	}
 
 	return nil
-}
-
-func (c *Connection) errorCallbackFunc(err error) {
-	if err != nil && c.OnError != nil {
-		c.OnError(err)
-	}
-}
-
-// join возвращает полный URI метода API
-func join(baseURL, method string) (string, error) {
-	u, err := url.Parse(baseURL)
-
-	if err != nil {
-		return method, err
-	}
-
-	u.Path = path.Join(u.Path, method)
-
-	return u.String(), nil
 }

@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// ErrCascadeCall
-type ErrCascadeCall struct {
+// Error ошибка метода API Каскад
+type Error struct {
 	exception   string
 	message     string
 	description string
@@ -16,8 +16,27 @@ type ErrCascadeCall struct {
 	statusCode  int
 }
 
+// NewCascadeError возвращает новый экземпляр ошибки выполнения метода API
+func NewCascadeError(err *errorMessage, method, path string, statusCode int) *Error {
+	e := &Error{
+		exception:   err.Exception,
+		message:     err.Message,
+		description: err.Description,
+		status:      err.Status,
+		path:        path,
+		method:      method,
+		statusCode:  statusCode,
+	}
+
+	if err.Error != "" {
+		e.message = err.Error
+	}
+
+	return e
+}
+
 // Error реализация интерфейса error
-func (e *ErrCascadeCall) Error() string {
+func (e *Error) Error() string {
 	var builder strings.Builder
 
 	if strings.TrimSpace(e.exception) != "" {
@@ -67,37 +86,55 @@ func (e *ErrCascadeCall) Error() string {
 	return builder.String()
 }
 
-// Exception исключение API
-func (e *ErrCascadeCall) Exception() string {
+// Exception тип исключения
+func (e *Error) Exception() string {
 	return e.exception
 }
 
-// Message сообщение об ошибке API
-func (e *ErrCascadeCall) Message() string {
+// Message сообщение об ошибке
+func (e *Error) Message() string {
 	return e.message
 }
 
-// ExceptionStatus состояние API
-func (e *ErrCascadeCall) ExceptionStatus() string {
+// ExceptionStatus состояние исключения
+func (e *Error) ExceptionStatus() string {
 	return e.status
 }
 
-// Description описание ошибки API
-func (e *ErrCascadeCall) Description() string {
+// Description описание ошибки
+func (e *Error) Description() string {
 	return e.description
 }
 
 // Path метод API, вернувший ошибку
-func (e *ErrCascadeCall) Path() string {
+func (e *Error) Path() string {
 	return e.path
 }
 
 // Method метод HTTP, использованный при вызове метода API
-func (e *ErrCascadeCall) Method() string {
+func (e *Error) Method() string {
 	return e.method
 }
 
 // StatusCode HTTP код результата вызова метода API
-func (e *ErrCascadeCall) StatusCode() int {
+func (e *Error) StatusCode() int {
 	return e.statusCode
+}
+
+// message сообщение сервера об ошибке
+type errorMessage struct {
+	// Message текст ошибки
+	Message string `json:"message"`
+
+	// Description описание ошибки
+	Description string `json:"description"`
+
+	// Error текст ошибки
+	Error string `json:"error"`
+
+	// Exception тип исключения
+	Exception string `json:"exception"`
+
+	// Status статус исключения
+	Status string `json:"status"`
 }
