@@ -19,5 +19,8 @@ testdata/trace
 # Shell scripts for testing
 *test*.sh
 
+# Test environment
+*.env
+
 # IDE settings
 .idea/

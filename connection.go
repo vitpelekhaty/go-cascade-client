@@ -86,7 +86,7 @@ func (conn *connection) Open(ctx context.Context, rawURL, username, passwd strin
 		option(opts)
 	}
 
-	if opts.authURL != conn.authURL {
+	if opts.authURL != conn.authURL && opts.authURL != "" {
 		conn.authURL = opts.authURL
 	}
 
