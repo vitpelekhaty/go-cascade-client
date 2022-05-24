@@ -11,8 +11,10 @@ type Flow byte
 const (
 	// FlowUnknown неизвестный тип подключения
 	FlowUnknown Flow = iota
+
 	// FlowDirect прямое подключение
 	FlowDirect
+
 	// FlowReverse обратное подключение
 	FlowReverse
 )
@@ -20,6 +22,7 @@ const (
 const (
 	// inFlow тип подключения - прямое
 	inFlow = "inFlow"
+
 	// outFlow тип подключения - обратное
 	outFlow = "outFlow"
 )
@@ -31,8 +34,10 @@ func (f *Flow) UnmarshalJSON(b []byte) (err error) {
 	switch s {
 	case inFlow:
 		*f = FlowDirect
+
 	case outFlow:
 		*f = FlowReverse
+
 	default:
 		*f = FlowUnknown
 		err = fmt.Errorf("unknown flow %s", s)
