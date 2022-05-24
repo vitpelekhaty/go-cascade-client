@@ -59,7 +59,9 @@ type Readings struct {
 	// ChannelID идентификатор канала/трубы
 	ChannelID null.Int `json:"channelId"`
 
-	// CreateAt момент чтения показания
+	// CreateAt момент чтения показания.
+	//
+	// Если в ответе метода API значение не указано или null, то в результате поле будет иметь значение 0
 	CreateAt ReadingTime `json:"createAt"`
 
 	// DeviceID идентификатор прибора учета
@@ -69,6 +71,8 @@ type Readings struct {
 	Input null.Int `json:"inputNum"`
 
 	// DT момент показания
+	//
+	// Если в ответе метода API значение не указано или null, то в результате поле будет иметь значение 0
 	DT ReadingTime `json:"dt"`
 
 	// ID идентификатор показания

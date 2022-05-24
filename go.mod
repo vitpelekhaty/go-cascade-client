@@ -3,7 +3,6 @@ module github.com/vitpelekhaty/go-cascade-client/v2
 go 1.17
 
 require (
-	github.com/dustin/go-humanize v1.0.0
 	github.com/guregu/null v4.0.0+incompatible
 	github.com/joho/godotenv v1.4.0
 	github.com/stretchr/testify v1.7.1

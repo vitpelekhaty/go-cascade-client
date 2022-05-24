@@ -61,7 +61,6 @@ func NewConnection(options ...Option) (IConnection, error) {
 
 var _ IConnection = (*connection)(nil)
 
-// connection соединение с Каскадом
 type connection struct {
 	rawURL, authURL string
 	secret          string
@@ -95,7 +94,6 @@ func (conn *connection) Open(ctx context.Context, rawURL, username, passwd strin
 	return conn.login(ctx, conn.authURL, conn.secret)
 }
 
-// login авторизация пользователя в Каскаде
 func (conn *connection) login(ctx context.Context, authURL string, secret string) error {
 	if _, err := url.Parse(authURL); err != nil {
 		return fmt.Errorf("POST %s: %v", authURL, err)
@@ -188,7 +186,7 @@ func (conn *connection) Gauges(ctx context.Context) ([]byte, error) {
 				return nil, fmt.Errorf("GET %s: %v", methodGauges, err)
 			}
 
-			data, statusCode, err = conn.gauges(ctx, methodURL, headers)
+			data, _, err = conn.gauges(ctx, methodURL, headers)
 
 			if err != nil {
 				return nil, fmt.Errorf("GET %s: %v", methodGauges, err)

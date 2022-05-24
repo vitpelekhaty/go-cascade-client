@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/vitpelekhaty/go-cascade-client/v2/archive"
+	"github.com/vitpelekhaty/go-cascade-client/v2/parsers"
 	"github.com/vitpelekhaty/httptracer"
 )
 
@@ -43,7 +44,7 @@ func TestConnection_Gauges(t *testing.T) {
 
 	err := godotenv.Load(*envFile)
 
-	require.NoError(t, err, "ошибка загрузки параметров теста")
+	require.NoError(t, err)
 
 	cascadeURL = os.Getenv("CASCADE_URL")
 	authURL = os.Getenv("CASCADE_AUTH_URL")
@@ -54,16 +55,16 @@ func TestConnection_Gauges(t *testing.T) {
 	tracePath = os.Getenv("CASCADE_TRACE_PATH")
 	strBodies = os.Getenv("CASCADE_TRACE_PARAM_BODIES")
 
-	require.NotEmpty(t, cascadeURL, "не указан адрес API")
+	require.NotEmpty(t, cascadeURL)
 
 	_, err = url.Parse(cascadeURL)
 
-	require.NoError(t, err, "некорректный URL API Каскада")
+	require.NoError(t, err)
 
 	if authURL != "" {
 		_, err = url.Parse(authURL)
 
-		require.NoError(t, err, "некорректный URL авторизации в API Каскад")
+		require.NoError(t, err)
 	}
 
 	var timeout = time.Second * 30
@@ -71,7 +72,7 @@ func TestConnection_Gauges(t *testing.T) {
 	if strTimeout != "" {
 		timeout, err = time.ParseDuration(strTimeout)
 
-		require.NoError(t, err, "некорректный формат таймаута")
+		require.NoError(t, err)
 	}
 
 	var insecureSkipVerify = false
@@ -79,7 +80,7 @@ func TestConnection_Gauges(t *testing.T) {
 	if strInsecureSkipVerify != "" {
 		insecureSkipVerify, err = strconv.ParseBool(strInsecureSkipVerify)
 
-		require.NoError(t, err, "insecure-skip-verify")
+		require.NoError(t, err)
 	}
 
 	var bodies = true
@@ -87,7 +88,7 @@ func TestConnection_Gauges(t *testing.T) {
 	if strBodies != "" {
 		bodies, err = strconv.ParseBool(strBodies)
 
-		require.NoError(t, err, "bodies")
+		require.NoError(t, err)
 	}
 
 	client := setupHTTPClient(timeout, insecureSkipVerify)
@@ -140,6 +141,18 @@ func TestConnection_Gauges(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.NotEmpty(t, gb)
+
+	items, err := parsers.ParseGaugesList(context.TODO(), gb)
+
+	require.NoError(t, err)
+
+	var row int
+
+	for item := range items {
+		assert.NoError(t, item.E, row)
+
+		row++
+	}
 }
 
 type gaugeTestCase struct {
@@ -179,7 +192,7 @@ func TestConnection_CurrentReadings(t *testing.T) {
 
 	err := godotenv.Load(*envFile)
 
-	require.NoError(t, err, "ошибка загрузки параметров теста")
+	require.NoError(t, err)
 
 	cascadeURL = os.Getenv("CASCADE_URL")
 	authURL = os.Getenv("CASCADE_AUTH_URL")
@@ -192,35 +205,35 @@ func TestConnection_CurrentReadings(t *testing.T) {
 	strBodies = os.Getenv("CASCADE_TRACE_PARAM_BODIES")
 	casesPath = os.Getenv("CASCADE_TEST_CASES_PATH")
 
-	require.NotEmpty(t, casesPath, "не указан файл тестовых случаев")
+	require.NotEmpty(t, casesPath)
 
 	cases, err := loadTestCases(casesPath)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, cases, "нет тестовых случаев")
+	require.NotEmpty(t, cases)
 
-	require.NotEmpty(t, cascadeURL, "не указан адрес API")
+	require.NotEmpty(t, cascadeURL)
 
 	_, err = url.Parse(cascadeURL)
 
-	require.NoError(t, err, "некорректный URL API Каскада")
+	require.NoError(t, err)
 
 	if authURL != "" {
 		_, err = url.Parse(authURL)
 
-		require.NoError(t, err, "некорректный URL авторизации в API Каскад")
+		require.NoError(t, err)
 	}
 
 	archiveType := archive.Parse(strDataArchive)
 
-	require.NotEqual(t, archive.UnknownArchive, archiveType, "неизвестный тип архива показаний")
+	require.NotEqual(t, archive.UnknownArchive, archiveType)
 
 	var timeout = time.Second * 30
 
 	if strTimeout != "" {
 		timeout, err = time.ParseDuration(strTimeout)
 
-		require.NoError(t, err, "некорректный формат таймаута")
+		require.NoError(t, err)
 	}
 
 	var insecureSkipVerify = false
@@ -228,7 +241,7 @@ func TestConnection_CurrentReadings(t *testing.T) {
 	if strInsecureSkipVerify != "" {
 		insecureSkipVerify, err = strconv.ParseBool(strInsecureSkipVerify)
 
-		require.NoError(t, err, "insecure-skip-verify")
+		require.NoError(t, err)
 	}
 
 	var bodies = true
@@ -236,7 +249,7 @@ func TestConnection_CurrentReadings(t *testing.T) {
 	if strBodies != "" {
 		bodies, err = strconv.ParseBool(strBodies)
 
-		require.NoError(t, err, "bodies")
+		require.NoError(t, err)
 	}
 
 	client := setupHTTPClient(timeout, insecureSkipVerify)
@@ -305,6 +318,18 @@ func TestConnection_CurrentReadings(t *testing.T) {
 		if err == nil {
 			assert.NotEmpty(t, b)
 		}
+
+		var row int
+
+		items, err := parsers.ParseReadings(context.TODO(), b)
+
+		require.NoError(t, err)
+
+		for item := range items {
+			assert.NoError(t, item.E)
+
+			row++
+		}
 	}
 }
 
@@ -313,7 +338,7 @@ func TestConnection_AlteredReadings(t *testing.T) {
 
 	err := godotenv.Load(*envFile)
 
-	require.NoError(t, err, "ошибка загрузки параметров теста")
+	require.NoError(t, err)
 
 	cascadeURL = os.Getenv("CASCADE_URL")
 	authURL = os.Getenv("CASCADE_AUTH_URL")
@@ -326,35 +351,35 @@ func TestConnection_AlteredReadings(t *testing.T) {
 	strBodies = os.Getenv("CASCADE_TRACE_PARAM_BODIES")
 	casesPath = os.Getenv("CASCADE_TEST_CASES_PATH")
 
-	require.NotEmpty(t, casesPath, "не указан файл тестовых случаев")
+	require.NotEmpty(t, casesPath)
 
 	cases, err := loadTestCases(casesPath)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, cases, "нет тестовых случаев")
+	require.NotEmpty(t, cases)
 
-	require.NotEmpty(t, cascadeURL, "не указан адрес API")
+	require.NotEmpty(t, cascadeURL)
 
 	_, err = url.Parse(cascadeURL)
 
-	require.NoError(t, err, "некорректный URL API Каскада")
+	require.NoError(t, err)
 
 	if authURL != "" {
 		_, err = url.Parse(authURL)
 
-		require.NoError(t, err, "некорректный URL авторизации в API Каскад")
+		require.NoError(t, err)
 	}
 
 	archiveType := archive.Parse(strDataArchive)
 
-	require.NotEqual(t, archive.UnknownArchive, archiveType, "неизвестный тип архива показаний")
+	require.NotEqual(t, archive.UnknownArchive, archiveType)
 
 	var timeout = time.Second * 30
 
 	if strTimeout != "" {
 		timeout, err = time.ParseDuration(strTimeout)
 
-		require.NoError(t, err, "некорректный формат таймаута")
+		require.NoError(t, err)
 	}
 
 	var insecureSkipVerify = false
@@ -362,7 +387,7 @@ func TestConnection_AlteredReadings(t *testing.T) {
 	if strInsecureSkipVerify != "" {
 		insecureSkipVerify, err = strconv.ParseBool(strInsecureSkipVerify)
 
-		require.NoError(t, err, "insecure-skip-verify")
+		require.NoError(t, err)
 	}
 
 	var bodies = true
@@ -370,7 +395,7 @@ func TestConnection_AlteredReadings(t *testing.T) {
 	if strBodies != "" {
 		bodies, err = strconv.ParseBool(strBodies)
 
-		require.NoError(t, err, "bodies")
+		require.NoError(t, err)
 	}
 
 	client := setupHTTPClient(timeout, insecureSkipVerify)
@@ -438,6 +463,18 @@ func TestConnection_AlteredReadings(t *testing.T) {
 
 		if err == nil {
 			assert.NotEmpty(t, b)
+		}
+
+		var row int
+
+		items, err := parsers.ParseReadings(context.TODO(), b)
+
+		require.NoError(t, err)
+
+		for item := range items {
+			assert.NoError(t, item.E)
+
+			row++
 		}
 	}
 }

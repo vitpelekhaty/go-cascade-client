@@ -13,7 +13,12 @@ const readingTimeLayout = `2006-01-02T15:04:05.999`
 // UnmarshalJSON реализация интерфейса Unmarshaler для типа ReadingTime
 func (rt *ReadingTime) UnmarshalJSON(b []byte) (err error) {
 	s := strings.Trim(string(b), `"`)
-	t, err := time.Parse(readingTimeLayout, s)
+
+	var t = time.Time{}
+
+	if s != "null" && s != "" {
+		t, err = time.Parse(readingTimeLayout, s)
+	}
 
 	*rt = ReadingTime(t)
 
